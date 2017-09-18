@@ -8,7 +8,7 @@ class QuestionnaireModel{
 	private static final ArrayList<Question> questions = new ArrayList<>();
 	private static final ArrayList<Question> regQuestions = new ArrayList<>();
 	private static final ArrayList<Question> demoQuestions = new ArrayList<>();
-	private static final Set<String> rejectableVariables = new HashSet<>(Arrays.asList(new String[]{"TZONE", "LOC", "LDF", "LDE", "AREA", "FSA", "FSA1", "LANG", "IT2", "S1", "S2", "S3", "INT01", "INT02", "INT99", "C3", "INT"}));//todo: make extendable
+	private static final Set<String> rejectableVariables = new HashSet<>(Arrays.asList("TZONE", "LOC", "LDF", "LDE", "AREA", "FSA", "FSA1", "LANG", "IT2", "S1", "S2", "S3", "INT01", "INT02", "INT99", "C3", "INT"));//todo: make extendable
 	private static String location = "";
 	
 	static int getStartingPosition(){

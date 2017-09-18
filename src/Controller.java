@@ -1,9 +1,6 @@
 import java.util.ArrayList;
 
 class Controller{
-	
-	private static boolean written = false;
-	
 	static int GetStartingPosition(){
 		return QuestionnaireModel.getStartingPosition();
 	}
@@ -17,11 +14,11 @@ class Controller{
 	}
 	
 	static void write(){
-		written = true;
+	
 	}
 	
-	static boolean parseASCFile(String text){
-		return Parser.parse(text);
+	static boolean parseASCFile(String filePath){
+		return Parser.parse(filePath);
 	}
 	
 	static ArrayList<Question> getRegQuestions(){
@@ -30,5 +27,14 @@ class Controller{
 	
 	static ArrayList<Question> getDemoQuestions(){
 		return QuestionnaireModel.getDemoQuestions();
+	}
+	
+	static String getParserErrMsg(){
+		return Parser.getErrString();
+	}
+	
+	static void addQuestion(String variable, String label, String shortLabel, String skipDestination, String skipCondition, ArrayList<String> choices){
+	
+	
 	}
 }
