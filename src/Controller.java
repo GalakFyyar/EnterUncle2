@@ -1,6 +1,12 @@
 import java.util.ArrayList;
 
 class Controller{
+	private static String errorMessage = "";
+	
+	static void setErrorMessage(String err){
+		errorMessage = err;
+	}
+	
 	static int GetStartingPosition(){
 		return QuestionnaireModel.getStartingPosition();
 	}
@@ -17,6 +23,7 @@ class Controller{
 	
 	}
 	
+	//Parse the .ASC file. The questionnaireModel will populate it's own variables afterwards
 	static boolean parseASCFile(String filePath){
 		return Parser.parse(filePath);
 	}
@@ -29,12 +36,12 @@ class Controller{
 		return QuestionnaireModel.getDemoQuestions();
 	}
 	
-	static String getParserErrMsg(){
-		return Parser.getErrString();
+	static String getErrorMessage(){
+		return errorMessage;
 	}
 	
-	static void addQuestion(String variable, String label, String shortLabel, String skipDestination, String skipCondition, ArrayList<String> choices){
-	
-	
+	static void addQuestion(String variable, int codeWidth, String label, String shortLabel, String skipDestination, String skipCondition, ArrayList<String[]> choices){
+		//capitalization
+		
 	}
 }

@@ -10,6 +10,6 @@ public class UncleConvert{
     }
     
     private static void test(){
-    
+		String fname = "G:\\FORUM\\FOLD\\FOLD.ASC";
     }
 }

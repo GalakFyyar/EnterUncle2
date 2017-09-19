@@ -32,4 +32,15 @@ class QuestionnaireModel{
 	static boolean isEmpty(){
 		return questions.isEmpty();
 	}
+	
+	private static void findAndSetLocation(){
+		for(Question q : questions){
+			if(q.variable.equals("INTRO")){
+				String shortLabel = q.shortLabel;
+				if(shortLabel.isEmpty())
+					location = shortLabel.substring(1, shortLabel.length() - 1);
+				break;
+			}
+		}
+	}
 }
