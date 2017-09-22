@@ -149,10 +149,10 @@ class GUI extends JFrame{
 	private void readFile(File ascFile){
 		fileToConvPathTF.setText(ascFile.getAbsolutePath());
 		
-		boolean success = Controller.parseASCFile(fileToConvPathTF.getText());
+		boolean success = Controller.parseASCFileAndPopulate(fileToConvPathTF.getText());
 		if(!success){
 			//statusTF.setText("Bad file, no questions loaded. Try converting to UTF-8?");
-			statusTF.setText(Controller.getParserErrMsg());
+			statusTF.setText(Controller.getErrorMessage());
 		}else
 			statusTF.setText("Read Successfully");
 		

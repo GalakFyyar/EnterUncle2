@@ -23,9 +23,11 @@ class Controller{
 	
 	}
 	
-	//Parse the .ASC file. The questionnaireModel will populate it's own variables afterwards
-	static boolean parseASCFile(String filePath){
-		return Parser.parse(filePath);
+	//Parse the .ASC file, then the questionnaireModel will populate some more Question fields
+	static boolean parseASCFileAndPopulate(String filePath){
+		boolean success = Parser.parse(filePath);
+		QuestionnaireModel.finalizeQuestions();
+		return success;
 	}
 	
 	static ArrayList<Question> getRegQuestions(){
@@ -40,8 +42,11 @@ class Controller{
 		return errorMessage;
 	}
 	
-	static void addQuestion(String variable, int codeWidth, String label, String shortLabel, String skipDestination, String skipCondition, ArrayList<String[]> choices){
-		//capitalization
-		
+	static void addQuestion(String variable, int codeWidth, String label, int quePosition, String shortLabel, String ifDestination, String elseDestination, String skipCondition, ArrayList<String[]> choices){
+		QuestionnaireModel.addQuestion(variable, codeWidth, label, quePosition, shortLabel, ifDestination, elseDestination, skipCondition, choices);
 	}
+	
+	//static void addQuestion(String variable, int codeWidth, String label, int quePosition, String shortLabel, String skipDestination, String skipCondition, ArrayList<String[]> choices){
+	//	QuestionnaireModel.addQuestion(variable, codeWidth, label, quePosition, shortLabel, skipDestination, skipCondition, choices);
+	//}
 }

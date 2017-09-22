@@ -15,9 +15,11 @@ class Parser{
 		String variable = "";
 		int codeWidth = -1;
 		String label = "";
+		int quePosition = 0;
 		String shortLabel = "";
-		String skipDestination = "";
 		String skipCondition = "";
+		String ifDestination = "";
+		String elseDestination = "";
 		ArrayList<String[]> choices = new ArrayList<>();
 		sc.nextLine();
 		sc.nextLine();
@@ -63,8 +65,11 @@ class Parser{
 				line = sc.nextLine();
 			}
 			if(line.startsWith("*SK")){			//Skip Found
-				skipDestination = sc.nextLine();
+				String skipDestination = sc.nextLine();
 				skipCondition = sc.nextLine();
+				String[] destinations = parseSkipDestination(skipDestination);
+				ifDestination = destinations[0];
+				elseDestination = destinations[1];
 				
 				line = sc.nextLine();
 			}
@@ -78,11 +83,11 @@ class Parser{
 				line = sc.nextLine();
 			}
 			
-			Controller.addQuestion(variable, codeWidth, label, shortLabel, skipDestination, skipCondition, choices);
+			Controller.addQuestion(variable, codeWidth, label, quePosition, shortLabel, ifDestination, elseDestination, skipCondition, choices);
+			quePosition++;
 		}
 		
 		sc.close();
-		
 		
 		return true;
 	}
@@ -102,6 +107,23 @@ class Parser{
 	
 	private static String parseShortLabel(String rawShortLabel){
 		return rawShortLabel.substring(1, rawShortLabel.length() - 1);
+	}
+	
+	private static String[] parseSkipDestination(String skipDestination){
+		String ifDestination;
+		String elseDestination = "";
+		
+		int arrowOffset = 2;		//need because of arrow in .ASC files "->"
+		int elseOffset = 6;			//need because of else text in .ASC files " ELSE "
+		int elseSkipStartPos = skipDestination.indexOf(' ');
+		if(elseSkipStartPos != -1){
+			elseDestination = skipDestination.substring(elseSkipStartPos + elseOffset);
+			ifDestination = skipDestination.substring(arrowOffset, elseSkipStartPos);
+		}else{
+			ifDestination = skipDestination.substring(arrowOffset);
+		}
+		
+		return new String[]{ifDestination, elseDestination};
 	}
 	
 	private static String[] parseChoice(String rawChoice, int codeWidth){

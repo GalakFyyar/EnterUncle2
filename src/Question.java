@@ -5,34 +5,25 @@ class Question{
 	int codeWidth;
 	String label;
 	String identifier;
-	String position;
-	int quePosition;
+	String position;	//Position in TXT file
+	int quePosition;	//Position in ASC file, maybe unnecessary, if no questions are removed, then this value will be the same as this object's index in the question list
 	String shortLabel;
 	String skipCondition;
-	String skipDestination;
+	String ifDestination = "";
+	String elseDestination = "";
 	int ifSkip;
 	int elseSkip;
-	private ArrayList<String[]> choices = new ArrayList<>();//[0]=code; [1]=label; [2]=skipDestination
+	ArrayList<String[]> choices = new ArrayList<>();//[0]=code; [1]=label; [2]=skipDestination
 	
-	public Question(){
-		variable = "";
-		codeWidth = -1;
-		label = "";
-		identifier = "";
-		position = "";
-		quePosition = -1;
-		shortLabel = "";
-		skipCondition = "";
-		skipDestination = "";
-		ifSkip = 0;
-		elseSkip = 0;
-	}
-	
-	public void addChoice(String code, String label){
-		choices.add(new String[] {code, label});
-	}
-	
-	public ArrayList<String[]> getChoices(){
-		return choices;
+	Question(String variable, int codeWidth, String label, int quePosition, String shortLabel, String skipCondition, String ifDestination, String elseDestination, ArrayList<String[]> choices){
+		this.variable = variable;
+		this.codeWidth = codeWidth;
+		this.label = label;
+		this.quePosition = quePosition;
+		this.shortLabel = shortLabel;
+		this.skipCondition = skipCondition;
+		this.ifDestination = ifDestination;
+		this.elseDestination = elseDestination;
+		this.choices = choices;
 	}
 }
