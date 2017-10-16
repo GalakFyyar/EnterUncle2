@@ -133,10 +133,6 @@ class QuestionnaireModel{
 		if(isNumber){															//Is Number
 			position = quePosition + Integer.parseInt(skipDestination);
 		}else{																	//Is Name
-			//If a slash is present, just ignore it
-			if(skipDestination.charAt(0) == '/')
-				skipDestination = skipDestination.substring(1);
-			
 			//Find the variable that the skip points to
 			for(Question q : questions){
 				if(q.variable.equals(skipDestination)){
