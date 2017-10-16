@@ -54,27 +54,24 @@ class GUI extends JFrame{
 		
 		DropTarget qaxDropTarget = new DropTarget(){
 			public synchronized void drop(DropTargetDropEvent evt){
+				File ascFile = null;
 				try{
 					evt.acceptDrop(DnDConstants.ACTION_COPY);
 					//noinspection unchecked
 					List<File> droppedFiles = (List<File>)evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
-					File ascFile = droppedFiles.get(0);
+					ascFile = droppedFiles.get(0);
 					
 					Controller.clearQuestionnaire();
 					bannerDemoQuestions.clear();
 					bannerRegQuestions.clear();
 					bannerWrap.removeAll();
 					getRootPane().revalidate();
-					
-					try{
-						readFile(ascFile);
-					}catch(Exception ex){
-						statusTF.setText("Couldn't read file");
-					}
-					//statusTF.setText("File Read or Parse Error");
 				}catch(Exception ex){
 					statusTF.setText("Drag and Drop Error");
 				}
+				
+				if(ascFile != null)
+					readFile(ascFile);
 			}
 		};
 		fileArea.setDropTarget(qaxDropTarget);

@@ -37,7 +37,8 @@ class QuestionnaireModel{
 		questions.add(new Question(variable, codeWidth, label, quePosition, shortLabel, ifDestination, elseDestination, skipCondition, choices));
 	}
 	
-	static void finalizeQuestions(){
+	//returns true for success, false otherwise
+	static boolean finalizeQuestions(){
 		//Find the Intro question and set the location
 		for(Question q : questions){
 			if(q.variable.equals("INTRO")){
@@ -61,11 +62,8 @@ class QuestionnaireModel{
 				regQuestions.add(q);
 			}
 			
-			//Replace tabs and remove square brackets around label
-			String label = q.label.replace('\t', ' ');
-			label = label.substring(1, label.length() - 1).trim();
-			
 			//Find and capitalize first letter
+			String label = q.label;
 			int periodIndex = label.indexOf('.');
 			if(periodIndex < 0)
 				periodIndex = 0;
@@ -76,13 +74,27 @@ class QuestionnaireModel{
 				}
 			}
 			
-			//Format Skips
-			//skip destination may be a variable name, if it is, find it, then calculate it's relative position
-			//if(ifExists)
-			//	q.ifSkip = findQuePosition(skipDestinationIfStr, rq.quePosition, rawQuestions);
-			//if(elseExists)
-			//	q.elseSkip = findQuePosition(skipDestinationElseStr, rq.quePosition, rawQuestions);
+			//remove / and + and *
+			q.ifDestination = q.ifDestination.replace("/", "").replace("+", "").replace("*", "");
+			q.elseDestination = q.elseDestination.replace("/", "").replace("+", "");
 			
+			Integer ifSkip = setSkipPosition(q.ifDestination, q.quePosition);
+			if(ifSkip != null)
+				q.ifSkip = ifSkip;
+			else{
+				Controller.setErrorMessage("Could not find skip destination :\"" + q.ifDestination + "\" in question " + q.variable);
+				System.out.println("null");
+				return false;
+			}
+			
+			Integer elseSkip = setSkipPosition(q.elseDestination, q.quePosition);
+			if(elseSkip != null)
+				q.elseSkip = elseSkip;
+			else{
+				Controller.setErrorMessage("Could not find skip destination :\"" + q.elseDestination + "\" in question " + q.variable);
+				System.out.println("null");
+				return false;
+			}
 		}
 		
 		//Determine the identifier of regular questions
@@ -100,5 +112,39 @@ class QuestionnaireModel{
 					q.identifier = label.substring(0, delimiter).toUpperCase();
 			}
 		}
+		
+		return true;
+	}
+	
+	//This method converts the skip destination to an integer.
+	//However, skip destination may allready be a number or blank or a name to another variable
+	//Skip destination may not contain slashes '/' pluses '+' or stars '*'
+	private static Integer setSkipPosition(String skipDestination, int quePosition){
+		if(skipDestination.isEmpty())											//Is Blank
+			return quePosition;
+		
+		boolean isNumber = true;
+		for(int i = 0; i < skipDestination.length(); i++){
+			if(!Character.isDigit(skipDestination.charAt(i)))
+				isNumber = false;
+		}
+		
+		Integer position = null;
+		if(isNumber){															//Is Number
+			position = quePosition + Integer.parseInt(skipDestination);
+		}else{																	//Is Name
+			//If a slash is present, just ignore it
+			if(skipDestination.charAt(0) == '/')
+				skipDestination = skipDestination.substring(1);
+			
+			//Find the variable that the skip points to
+			for(Question q : questions){
+				if(q.variable.equals(skipDestination)){
+					position = q.quePosition;
+					break;
+				}
+			}
+		}
+		return position;
 	}
 }

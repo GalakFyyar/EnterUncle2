@@ -15,7 +15,7 @@ class Question{
 	int elseSkip;
 	ArrayList<String[]> choices = new ArrayList<>();//[0]=code; [1]=label; [2]=skipDestination
 	
-	Question(String variable, int codeWidth, String label, int quePosition, String shortLabel, String skipCondition, String ifDestination, String elseDestination, ArrayList<String[]> choices){
+	Question(String variable, int codeWidth, String label, int quePosition, String shortLabel, String ifDestination, String elseDestination, String skipCondition, ArrayList<String[]> choices){
 		this.variable = variable;
 		this.codeWidth = codeWidth;
 		this.label = label;

@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 class Parser{
+	//returns true for success, false otherwise
 	static boolean parse(String filePath){
 		Scanner sc;
 		try{
@@ -12,15 +13,8 @@ class Parser{
 			return false;
 		}
 		
-		String variable = "";
-		int codeWidth = -1;
-		String label = "";
+		
 		int quePosition = 0;
-		String shortLabel = "";
-		String skipCondition = "";
-		String ifDestination = "";
-		String elseDestination = "";
-		ArrayList<String[]> choices = new ArrayList<>();
 		sc.nextLine();
 		sc.nextLine();
 		sc.nextLine();
@@ -28,6 +22,14 @@ class Parser{
 		sc.nextLine();
 		String line = sc.nextLine();
 		while(true){
+			String variable = "";
+			int codeWidth = -1;
+			String label = "";
+			String shortLabel = "";
+			String skipCondition = "";
+			String ifDestination = "";
+			String elseDestination = "";
+			ArrayList<String[]> choices = new ArrayList<>();
 			if(line.startsWith("---")){				//Reached end, stop parsing
 				break;
 			}

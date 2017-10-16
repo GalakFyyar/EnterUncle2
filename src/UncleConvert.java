@@ -1,8 +1,8 @@
 public class UncleConvert{
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        System.out.println("START");
         test();
-        launchGUI();
+        //launchGUI();
     }
     
     private static void launchGUI(){
@@ -10,6 +10,8 @@ public class UncleConvert{
     }
     
     private static void test(){
-		String fname = "G:\\FORUM\\FOLD\\FOLD.ASC";
-    }
+		String fileName = "G:\\FORUM\\FOLD\\FOLD.ASC";
+		Controller.parseASCFileAndPopulate(fileName);
+		System.out.println("END");
+	}
 }
