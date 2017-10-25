@@ -148,10 +148,14 @@ class GUI extends JFrame{
 		
 		boolean success = Controller.parseASCFileAndPopulate(fileToConvPathTF.getText());
 		if(!success){
-			//statusTF.setText("Bad file, no questions loaded. Try converting to UTF-8?");
-			statusTF.setText(Controller.getErrorMessage());
+			String errorMessage = Controller.getErrorMessage();
+			if(errorMessage.isEmpty())
+				errorMessage = "Bad file, no questions loaded. Try converting to UTF-8?";
+			statusTF.setText(errorMessage);
 		}else
 			statusTF.setText("Read Successfully");
+		
+		Controller.selectQuestions();
 		
 		//populate banner pane
 		for(Question dq : Controller.getDemoQuestions()){

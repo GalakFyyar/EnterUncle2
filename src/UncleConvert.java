@@ -1,8 +1,8 @@
 public class UncleConvert{
     public static void main(String[] args) {
         System.out.println("START");
-        test();
-        //launchGUI();
+        //test();
+        launchGUI();
     }
     
     private static void launchGUI(){

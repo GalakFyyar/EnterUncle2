@@ -1,7 +1,12 @@
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 class Controller{
 	private static String errorMessage = "";
+	private static final Set<String> rejectableVariables = new HashSet<>(Arrays.asList("TZONE", "LOC", "LDF", "LDE", "AREA", "FSA", "FSA1", "LANG", "IT2", "S1", "S2", "S3", "INT01", "INT02", "INT99", "C3", "INT"));//todo: make extendable
+	
 	
 	static void setErrorMessage(String err){
 		errorMessage = err;
@@ -23,11 +28,12 @@ class Controller{
 	
 	}
 	
+	//TODO: more in-house
 	//Parse the .ASC file, then the questionnaireModel will populate some more Question fields
 	static boolean parseASCFileAndPopulate(String filePath){
-		boolean success = Parser.parse(filePath);
-		QuestionnaireModel.finalizeQuestions();
-		return success;
+		boolean parseSuccess = Parser.parse(filePath);
+		boolean finalizeSuccess = QuestionnaireModel.finalizeQuestions();
+		return parseSuccess && finalizeSuccess;
 	}
 	
 	static ArrayList<Question> getRegQuestions(){
@@ -46,7 +52,8 @@ class Controller{
 		QuestionnaireModel.addQuestion(variable, codeWidth, label, quePosition, shortLabel, ifDestination, elseDestination, skipCondition, choices);
 	}
 	
-	//static void addQuestion(String variable, int codeWidth, String label, int quePosition, String shortLabel, String skipDestination, String skipCondition, ArrayList<String[]> choices){
-	//	QuestionnaireModel.addQuestion(variable, codeWidth, label, quePosition, shortLabel, skipDestination, skipCondition, choices);
-	//}
+	//TODO: implement method and add comment
+	static void selectQuestions(){
+		//Set questions = QuestionnaireModel.getQuestions();
+	}
 }
