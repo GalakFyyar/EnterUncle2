@@ -2,10 +2,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Function;
 
 class Controller{
 	private static String errorMessage = "";
-	private static final Set<String> rejectableVariables = new HashSet<>(Arrays.asList("TZONE", "LOC", "LDF", "LDE", "AREA", "FSA", "FSA1", "LANG", "IT2", "S1", "S2", "S3", "INT01", "INT02", "INT99", "C3", "INT"));//todo: make extendable
+	private static final Set<String> unwantedVariables = new HashSet<>(Arrays.asList("TZONE", "LOC", "LDF", "LDE", "AREA", "FSA", "FSA1", "LANG", "IT2", "S1", "S2", "S3", "INT01", "INT02", "INT99", "C3", "INT"));//todo: make extendable
 	
 	
 	static void setErrorMessage(String err){
@@ -52,8 +53,17 @@ class Controller{
 		QuestionnaireModel.addQuestion(variable, codeWidth, label, quePosition, shortLabel, ifDestination, elseDestination, skipCondition, choices);
 	}
 	
-	//TODO: implement method and add comment
-	static void selectQuestions(){
-		//Set questions = QuestionnaireModel.getQuestions();
+	static void filterOutBadQuestions(){
+		Set<Question> questions = QuestionnaireModel.getQuestionsAsSet();
+		questions.removeIf(q -> q.label.isEmpty());									//remove questions with no label
+		questions.removeIf(q -> q.choices.isEmpty());								//remove questions with no choices
+		questions.removeIf(q -> q.variable.charAt(0) == 'R');						//hopefully only removes recruit questions
+		questions.removeIf(q -> unwantedVariables.contains(q.variable));			//remove unwanted variables
+		
+		Function<String, Boolean> testHearAgain = label -> {
+			String l = label.toLowerCase();
+			return (l.contains("hear") && l.contains("again")) || (l.contains("repeat") && l.contains("answers"));
+		};
+		questions.forEach(q -> q.choices.removeIf(choice -> testHearAgain.apply(choice[1])));
 	}
 }

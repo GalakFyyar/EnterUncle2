@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -152,7 +153,26 @@ class QuestionnaireModel{
 		return position;
 	}
 	
-	//public static Set<Question> getQuestions(){
-	//	return questions;
-	//}
+	static HashSet<Question> getQuestionsAsSet(){
+		return new HashSet<>(questions);
+	}
+	
+	public static void printAll(){
+		for(Question q : questions){
+			printQuestion(q);
+		}
+	}
+	
+	public static void printQuestion(Question q){
+		System.out.println(q.variable);
+		if(!q.label.isEmpty())
+			System.out.println(q.label);
+		else
+			System.out.println("EMPTY LABEL");
+		System.out.println(q.identifier);
+		System.out.println(q.position);
+		for(String[] c : q.choices)
+			System.out.println(c[0] + "|--|" + c[1]);
+		System.out.println();
+	}
 }

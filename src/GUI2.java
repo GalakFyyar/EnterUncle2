@@ -8,12 +8,10 @@ import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
-class GUI extends JFrame{
+class GUI2 extends JFrame{
 	private static final String VERSION = "2.0";
 	private static final long serialVersionUID = 1L;
 	private static final int FRAME_WIDTH = 720;
@@ -32,7 +30,7 @@ class GUI extends JFrame{
 	private Map<JCheckBox, Question> bannerDemoQuestions = new LinkedHashMap<>();
 	private JRadioButton[] radioButtons = {new JRadioButton("Municipal", true), new JRadioButton("Provincial"), new JRadioButton("Federal")};
 	
-	GUI(){
+	GUI2(){
 		try{
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		}catch(Exception ignored){}
