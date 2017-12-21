@@ -1,56 +1,64 @@
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
 
 class GUI2 extends JFrame{
 	private static final String VERSION = "2.0";
 	private static final long serialVersionUID = 1L;
-	private static final int FRAME_WIDTH = 720;
-	private static final int FRAME_HEIGHT = 480;
-	
-	private JButton writeOutBTN;
-	private JDesktopPane fileArea;
-	private JTextField fileToConvPathTF;
-	private JCheckBox startPosCB;
-	private JTextField startPosTF;
-	private JTextField statusTF;
-	private JPanel bannerWrap;
-	
-	private ButtonGroup governmentLevel = new ButtonGroup();
-	private Map<JCheckBox, Question> bannerRegQuestions = new LinkedHashMap<>();
-	private Map<JCheckBox, Question> bannerDemoQuestions = new LinkedHashMap<>();
-	private JRadioButton[] radioButtons = {new JRadioButton("Municipal", true), new JRadioButton("Provincial"), new JRadioButton("Federal")};
 	
 	GUI2(){
 		try{
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		}catch(Exception ignored){}
 		
+		//Menu Bar
+		loadMenuBar(this);
+		
+		JPanel mainPanel = new JPanel(new BorderLayout());
+		//mainPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+		
+		//Load Components on mainPanel
+		loadFileArea(mainPanel);
+		
+		getContentPane().add(mainPanel);
 		setTitle("Enter Uncle v" + VERSION);
-		setSize(FRAME_WIDTH, FRAME_HEIGHT);
-		setLocationRelativeTo(null);		//Center
-		//setResizable(false);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		setExtendedState(JFrame.MAXIMIZED_BOTH);
+		setVisible(true);
 		
-		governmentLevel.add(radioButtons[0]);
-		governmentLevel.add(radioButtons[1]);
-		governmentLevel.add(radioButtons[2]);
+		System.out.println("LOADED GUI");
+	}
+	
+	private void loadMenuBar(JFrame context){
+		JMenuBar menuBar = new JMenuBar();
 		
-		JPanel mainPanel = new JPanel();
-		mainPanel.setLayout(new GridLayout(0, 2, 15, 0));
-		loadComponents(mainPanel);
+		JMenu fileMenu = new JMenu("File");
+		JMenuItem openFileItem = new JMenuItem("Open...");
+		fileMenu.add(openFileItem);
+		JMenuItem saveFileItem = new JMenuItem("Save");
+		fileMenu.add(saveFileItem);
+		menuBar.add(fileMenu);
 		
-		ButtonListener convertListener = new ButtonListener();
-		writeOutBTN.addActionListener(convertListener);
+		JMenu optionsMenu = new JMenu("Options");
+		JMenuItem killItem = new JMenuItem("Kill All Humans!");
+		optionsMenu.add(killItem);
+		menuBar.add(optionsMenu);
+		
+		context.setJMenuBar(menuBar);
+	}
+	
+	private void loadFileArea(JPanel mainPanel){
+		JDesktopPane fileArea = new JDesktopPane();
+		fileArea.setToolTipText("Drag files onto here");
+		fileArea.setBackground(Color.DARK_GRAY);
 		
 		DropTarget qaxDropTarget = new DropTarget(){
 			public synchronized void drop(DropTargetDropEvent evt){
@@ -60,161 +68,61 @@ class GUI2 extends JFrame{
 					//noinspection unchecked
 					List<File> droppedFiles = (List<File>)evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
 					ascFile = droppedFiles.get(0);
-					
-					Controller.clearQuestionnaire();
-					bannerDemoQuestions.clear();
-					bannerRegQuestions.clear();
-					bannerWrap.removeAll();
-					getRootPane().revalidate();
 				}catch(Exception ex){
-					statusTF.setText("Drag and Drop Error");
+					//statusTF.setText("Drag and Drop Error");
+					ex.printStackTrace();
 				}
 				
-				if(ascFile != null)
-					readFile(ascFile);
+				if(ascFile != null){
+					Controller.parseASCFileAndPopulate(ascFile.getAbsolutePath());
+					loadMainPanel(mainPanel);
+				}
 			}
 		};
 		fileArea.setDropTarget(qaxDropTarget);
 		
-		getContentPane().add(mainPanel);
-		//setExtendedState(JFrame.MAXIMIZED_BOTH);
-		//setUndecorated(true);
-		setVisible(true);
-		
-		System.out.println("LOADED GUI");
+		mainPanel.add(fileArea);
 	}
 	
-	private void loadComponents(JPanel mainPanel){
-		mainPanel.setBorder(new EmptyBorder(15, 15, 15, 15));
-		
-		JPanel leftPanel = new JPanel();
-		leftPanel.setLayout(new BorderLayout(0, 15));
-		
-		bannerWrap = new JPanel();
-		bannerWrap.setLayout(new GridLayout(0, 2));
-		JScrollPane scrollPane = new JScrollPane(bannerWrap);
-		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		leftPanel.add(scrollPane, BorderLayout.CENTER);
-		
-		JPanel rightPanel = new JPanel();
-		rightPanel.setLayout(new BorderLayout(0, 0));
-		
-		fileToConvPathTF = new JTextField();
-		fileToConvPathTF.setForeground(Color.GRAY);
-		fileToConvPathTF.setText("ASC input file");
-		rightPanel.add(fileToConvPathTF, BorderLayout.NORTH);
-		
-		fileArea = new JDesktopPane();
-		fileArea.setToolTipText("Drag files onto here");
-		fileArea.setBackground(Color.LIGHT_GRAY);
-		rightPanel.add(fileArea, BorderLayout.CENTER);
-		
-		JPanel buttonWrap = new JPanel();
-		buttonWrap.setLayout(new GridLayout(4, 1, 0, 10));
-		
-		JPanel governmentLevelWrap = new JPanel();
-		governmentLevelWrap.add(radioButtons[0]);
-		governmentLevelWrap.add(radioButtons[1]);
-		governmentLevelWrap.add(radioButtons[2]);
-		governmentLevelWrap.setPreferredSize(new Dimension(0, 24));
-		buttonWrap.add(governmentLevelWrap);
+	private void loadMainPanel(JPanel mainPanel){
+		mainPanel.removeAll();
+		ArrayList<Question> questions = Controller.getAllQuestions();
+		mainPanel.setLayout(new BorderLayout());
 		
 		
-		JPanel startPosWrap = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		startPosCB = new JCheckBox("Start Position Override:");
-		startPosCB.addActionListener(new CheckListener());
-		startPosTF = new JTextField(String.valueOf(Controller.GetStartingPosition()), 4);
-		startPosTF.setHorizontalAlignment(SwingConstants.RIGHT);
-		startPosWrap.add(startPosCB);
-		startPosWrap.add(startPosTF);
-		startPosWrap.setPreferredSize(new Dimension(0, 26));
-		buttonWrap.add(startPosWrap);
+		//TODO -- add ImageIcon icon createImageIcon();
+		JPanel leftPane = new JPanel();
+		leftPane.setLayout(new GridLayout(questions.size(), 1));
+		questions.forEach(q -> leftPane.add(new JLabel(q.variable)));
+		JScrollPane leftScrollPane = new JScrollPane(leftPane);
+		leftScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		
 		
-		statusTF = new JTextField();
-		statusTF.setForeground(Color.BLACK);
-		statusTF.setText("Status");
-		buttonWrap.add(statusTF);
+		JPanel rightPane = new JPanel();
+		rightPane.setLayout(new GridLayout(questions.size(), 1));
+		questions.forEach(q -> rightPane.add(new JTextField(q.variable, 15)));
+		JScrollPane rightScrollPane = new JScrollPane(rightPane);
+		rightScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		
-		writeOutBTN = new JButton("Write!");
-		buttonWrap.add(writeOutBTN);
+		mainPanel.add(leftScrollPane, BorderLayout.WEST);
+		mainPanel.add(rightScrollPane, BorderLayout.EAST);
 		
-		rightPanel.add(buttonWrap, BorderLayout.SOUTH);
-		
-		mainPanel.add(leftPanel);
-		mainPanel.add(rightPanel);
-	}
-	
-	private void readFile(File ascFile){
-		fileToConvPathTF.setText(ascFile.getAbsolutePath());
-		
-		boolean success = Controller.parseASCFileAndPopulate(fileToConvPathTF.getText());
-		if(!success){
-			String errorMessage = Controller.getErrorMessage();
-			if(errorMessage.isEmpty())
-				errorMessage = "Bad file, no questions loaded. Try converting to UTF-8?";
-			statusTF.setText(errorMessage);
-		}else
-			statusTF.setText("Read Successfully");
-		
-		QuestionnaireModel.printAll();
-		Controller.filterOutBadQuestions();
-		System.out.println("==================\n==================\n==================");
-		QuestionnaireModel.printAll();
-		
-		
-		//populate banner pane
-		for(Question dq : Controller.getDemoQuestions()){
-			JCheckBox jcb = new JCheckBox(dq.variable);
-			jcb.setSelected(true);
-			bannerWrap.add(jcb);
-			bannerDemoQuestions.put(jcb, dq);
-		}
-		for(Question rq : Controller.getRegQuestions()){
-			JCheckBox jcb = new JCheckBox(rq.variable);
-			bannerWrap.add(jcb);
-			bannerRegQuestions.put(jcb, rq);
-		}
-		getRootPane().revalidate();
-	}
-	
-	private class ButtonListener implements ActionListener{
-		public void actionPerformed(ActionEvent e){
-			if(e.getSource() == writeOutBTN){
-				GovernmentLevel govLvl = GovernmentLevel.MUNICIPAL;
-				if(governmentLevel.getSelection() == radioButtons[0].getModel())
-					govLvl = GovernmentLevel.MUNICIPAL;
-				else if(governmentLevel.getSelection() == radioButtons[1].getModel())
-					govLvl = GovernmentLevel.PROVINCIAL;
-				else if(governmentLevel.getSelection() == radioButtons[2].getModel())
-					govLvl = GovernmentLevel.FEDERAL;
-				
-				
-				if(Controller.isQuestionnaireEmpty()){
-					statusTF.setText("Can't Write - Empty Qnair");
-					return;
-				}
-				ArrayList<Question> checked = new ArrayList<>();
-				for(Map.Entry entry : bannerDemoQuestions.entrySet()){
-					if(((JCheckBox) entry.getKey()).isSelected())
-						checked.add((Question)entry.getValue());
-				}
-				for(Map.Entry entry : bannerRegQuestions.entrySet()){
-					if(((JCheckBox) entry.getKey()).isSelected())
-						checked.add((Question)entry.getValue());
-				}
-				Controller.write();
-				
-				statusTF.setText("Conversion Complete");
-				System.out.println("DONE");
+		mainPanel.addMouseListener(new MouseAdapter(){
+			@Override
+			public void mouseClicked(MouseEvent e){
+				System.out.println("Hey");
 			}
-		}
+		});
+		
+		mainPanel.revalidate();
+		mainPanel.repaint();
 	}
 	
-	private class CheckListener implements ActionListener{
-		@Override
-		public void actionPerformed(ActionEvent e){
-			System.out.println("hi");
-		}
+	private void loadContentPanelForQuestion(JPanel contentPanel){
+	
+	}
+	
+	private void loadContentPanelForTable(JPanel contentPanel){
+	
 	}
 }

@@ -25,15 +25,10 @@ class Controller{
 		return QuestionnaireModel.isEmpty();
 	}
 	
-	static void write(){
-	
-	}
-	
-	//TODO: more in-house
 	//Parse the .ASC file, then the questionnaireModel will populate some more Question fields
 	static boolean parseASCFileAndPopulate(String filePath){
 		boolean parseSuccess = Parser.parse(filePath);
-		boolean finalizeSuccess = QuestionnaireModel.finalizeQuestions();
+		boolean finalizeSuccess = QuestionnaireModel.finalizeQuestions();// TODO have this in Controller?
 		return parseSuccess && finalizeSuccess;
 	}
 	
@@ -45,6 +40,10 @@ class Controller{
 		return QuestionnaireModel.getDemoQuestions();
 	}
 	
+	static ArrayList<Question> getAllQuestions() {
+		return QuestionnaireModel.getAllQuestions();
+	}
+	
 	static String getErrorMessage(){
 		return errorMessage;
 	}
@@ -54,7 +53,7 @@ class Controller{
 	}
 	
 	static void filterOutBadQuestions(){
-		Set<Question> questions = QuestionnaireModel.getQuestionsAsSet();
+		ArrayList<Question> questions = QuestionnaireModel.getAllQuestions();
 		questions.removeIf(q -> q.label.isEmpty());									//remove questions with no label
 		questions.removeIf(q -> q.choices.isEmpty());								//remove questions with no choices
 		questions.removeIf(q -> q.variable.charAt(0) == 'R');						//hopefully only removes recruit questions
@@ -65,5 +64,9 @@ class Controller{
 			return (l.contains("hear") && l.contains("again")) || (l.contains("repeat") && l.contains("answers"));
 		};
 		questions.forEach(q -> q.choices.removeIf(choice -> testHearAgain.apply(choice[1])));
+	}
+	
+	static void write(){
+	
 	}
 }

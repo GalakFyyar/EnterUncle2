@@ -28,6 +28,10 @@ class QuestionnaireModel{
 		return demoQuestions;
 	}
 	
+	static ArrayList<Question> getAllQuestions(){
+		return questions;
+	}
+	
 	static boolean isEmpty(){
 		return questions.isEmpty();
 	}
@@ -151,10 +155,6 @@ class QuestionnaireModel{
 			}
 		}
 		return position;
-	}
-	
-	static HashSet<Question> getQuestionsAsSet(){
-		return new HashSet<>(questions);
 	}
 	
 	public static void printAll(){

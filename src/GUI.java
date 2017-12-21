@@ -40,7 +40,7 @@ class GUI extends JFrame{
 		setTitle("Enter Uncle v" + VERSION);
 		setSize(FRAME_WIDTH, FRAME_HEIGHT);
 		setLocationRelativeTo(null);		//Center
-		//setResizable(false);
+		setResizable(false);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		
 		governmentLevel.add(radioButtons[0]);
@@ -79,8 +79,6 @@ class GUI extends JFrame{
 		fileArea.setDropTarget(qaxDropTarget);
 		
 		getContentPane().add(mainPanel);
-		//setExtendedState(JFrame.MAXIMIZED_BOTH);
-		//setUndecorated(true);
 		setVisible(true);
 		
 		System.out.println("LOADED GUI");
@@ -148,9 +146,10 @@ class GUI extends JFrame{
 	}
 	
 	private void readFile(File ascFile){
-		fileToConvPathTF.setText(ascFile.getAbsolutePath());
+		String path = ascFile.getAbsolutePath();
+		fileToConvPathTF.setText(path);
 		
-		boolean success = Controller.parseASCFileAndPopulate(fileToConvPathTF.getText());
+		boolean success = Controller.parseASCFileAndPopulate(path);
 		if(!success){
 			String errorMessage = Controller.getErrorMessage();
 			if(errorMessage.isEmpty())

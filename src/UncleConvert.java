@@ -6,7 +6,7 @@ public class UncleConvert{
     }
     
     private static void launchGUI(){
-		javax.swing.SwingUtilities.invokeLater(GUI::new);
+		javax.swing.SwingUtilities.invokeLater(GUI2::new);
     }
     
     private static void test(){
