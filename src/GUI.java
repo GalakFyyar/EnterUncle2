@@ -123,7 +123,7 @@ class GUI extends JFrame{
 		JPanel startPosWrap = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		startPosCB = new JCheckBox("Start Position Override:");
 		startPosCB.addActionListener(new CheckListener());
-		startPosTF = new JTextField(String.valueOf(Controller.GetStartingPosition()), 4);
+		startPosTF = new JTextField(String.valueOf(Controller.getStartingPosition()), 4);
 		startPosTF.setHorizontalAlignment(SwingConstants.RIGHT);
 		startPosWrap.add(startPosCB);
 		startPosWrap.add(startPosTF);
@@ -149,7 +149,7 @@ class GUI extends JFrame{
 		String path = ascFile.getAbsolutePath();
 		fileToConvPathTF.setText(path);
 		
-		boolean success = Controller.parseASCFileAndPopulate(path);
+		boolean success = Controller.parseASCFileAndPopulateQuestionnaireModel(path);
 		if(!success){
 			String errorMessage = Controller.getErrorMessage();
 			if(errorMessage.isEmpty())
@@ -159,7 +159,7 @@ class GUI extends JFrame{
 			statusTF.setText("Read Successfully");
 		
 		QuestionnaireModel.printAll();
-		Controller.filterOutBadQuestions();
+		//Controller.filterOutBadQuestions();
 		System.out.println("==================\n==================\n==================");
 		QuestionnaireModel.printAll();
 		
@@ -204,7 +204,7 @@ class GUI extends JFrame{
 					if(((JCheckBox) entry.getKey()).isSelected())
 						checked.add((Question)entry.getValue());
 				}
-				Controller.write();
+				//Controller.write();
 				
 				statusTF.setText("Conversion Complete");
 				System.out.println("DONE");

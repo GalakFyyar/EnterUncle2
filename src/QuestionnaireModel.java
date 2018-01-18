@@ -1,17 +1,22 @@
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.Map;
 
 class QuestionnaireModel{
-	private static final int START_POS = 248;
 	private static final ArrayList<Question> questions = new ArrayList<>();
 	private static final ArrayList<Question> regQuestions = new ArrayList<>();
 	private static final ArrayList<Question> demoQuestions = new ArrayList<>();
+	private static final Map<String, Question> questionMap = new HashMap<>();
+	private static final int START_POS = 248;
 	private static String location = "";
 	
 	static int getStartingPosition(){
 		return START_POS;
+	}
+	
+	public static String getLocation(){
+		return location;
 	}
 	
 	static void clearQuestions(){
@@ -39,9 +44,9 @@ class QuestionnaireModel{
 	static void addQuestion(String variable, int codeWidth, String label, int quePosition, String shortLabel, String ifDestination, String elseDestination, String skipCondition, ArrayList<String[]> choices){
 		questions.add(new Question(variable, codeWidth, label, quePosition, shortLabel, ifDestination, elseDestination, skipCondition, choices));
 	}
-	
 	//returns true for success, false otherwise
-	static boolean finalizeQuestions(){
+	
+	static boolean secondPassParsing(){
 		//Find the Intro question and set the location
 		for(Question q : questions){
 			if(q.variable.equals("INTRO")){
@@ -128,9 +133,9 @@ class QuestionnaireModel{
 		
 		return true;
 	}
-	
 	//This method converts the skip destination to an integer.
-	//However, skip destination may allready be a number or blank or a name to another variable
+	
+	//Skip destination may allready be a number or blank or a name to another variable
 	//Skip destination may not contain slashes '/' pluses '+' or stars '*'
 	private static Integer setSkipPosition(String skipDestination, int quePosition){
 		if(skipDestination.isEmpty())											//Is Blank
@@ -157,13 +162,15 @@ class QuestionnaireModel{
 		return position;
 	}
 	
-	public static void printAll(){
+	@SuppressWarnings("unused")
+	static void printAll(){
 		for(Question q : questions){
 			printQuestion(q);
 		}
 	}
 	
-	public static void printQuestion(Question q){
+	@SuppressWarnings({"unused", "WeakerAccess"})
+	static void printQuestion(Question q){
 		System.out.println(q.variable);
 		if(!q.label.isEmpty())
 			System.out.println(q.label);

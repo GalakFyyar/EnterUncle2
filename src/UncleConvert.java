@@ -11,7 +11,7 @@ public class UncleConvert{
     
     private static void test(){
 		String fileName = "G:\\FORUM\\FOLD\\FOLD.ASC";
-		Controller.parseASCFileAndPopulate(fileName);
+		Controller.parseASCFileAndPopulateQuestionnaireModel(fileName);
 		System.out.println("END");
 	}
 }
