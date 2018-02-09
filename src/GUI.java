@@ -150,13 +150,13 @@ class GUI extends JFrame{
 		fileToConvPathTF.setText(path);
 		
 		boolean success = Controller.parseASCFileAndPopulateQuestionnaireModel(path);
-		if(!success){
-			String errorMessage = Controller.getErrorMessage();
-			if(errorMessage.isEmpty())
-				errorMessage = "Bad file, no questions loaded. Try converting to UTF-8?";
-			statusTF.setText(errorMessage);
-		}else
-			statusTF.setText("Read Successfully");
+		//if(!success){
+		//	String errorMessage = Controller.getErrorMessage();
+		//	if(errorMessage.isEmpty())
+		//		errorMessage = "Bad file, no questions loaded. Try converting to UTF-8?";
+		//	statusTF.setText(errorMessage);
+		//}else
+		//	statusTF.setText("Read Successfully");
 		
 		QuestionnaireModel.printAll();
 		//Controller.filterOutBadQuestions();

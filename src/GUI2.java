@@ -1,15 +1,4 @@
-import javax.swing.BorderFactory;
-import javax.swing.JDesktopPane;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.UIManager;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -33,8 +22,6 @@ class GUI2 extends JFrame{
 	private static final int FRAME_WIDTH = 720;
 	private static final int FRAME_HEIGHT = 480;
 	private static File ascFile = null;
-	
-	private static PanelItem selectedItem;
 	
 	GUI2(){
 		try{
@@ -90,7 +77,7 @@ class GUI2 extends JFrame{
 					List<File> droppedFiles = (List<File>)evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
 					ascFile = droppedFiles.get(0);
 				}catch(Exception ex){
-					//statusTF.setText("Drag and Drop Error");
+					Controller.setErrorMessage("Drag and Drop Error");
 					ex.printStackTrace();
 				}
 				
@@ -113,6 +100,7 @@ class GUI2 extends JFrame{
 		mainPanel.setLayout(new BorderLayout());
 		
 		JPanel contentPanel = new JPanel(new BorderLayout());
+		
 		
 		//TODO -- add ImageIcon icon createImageIcon();
 		JPanel questionPanel = new JPanel();					//Goes on the left!
@@ -138,18 +126,6 @@ class GUI2 extends JFrame{
 		mainPanel.repaint();
 	}
 	
-	private void loadContentPanelForQuestion(JPanel contentPanel, Question q){
-		contentPanel.removeAll();
-		contentPanel.add(new JLabel("Q: " + q.label), BorderLayout.CENTER);
-		contentPanel.revalidate();
-	}
-	
-	private void loadContentPanelForTable(JPanel contentPanel, Table t){
-		contentPanel.removeAll();
-		contentPanel.add(new JLabel(t.title), BorderLayout.CENTER);
-		contentPanel.revalidate();
-	}
-	
 	static File getASCFile(){
 		return ascFile;
 	}
@@ -165,7 +141,7 @@ class GUI2 extends JFrame{
 		@Override
 		public void mouseClicked(MouseEvent e){
 			super.mouseClicked(e);
-			loadContentPanelForQuestion(super.contentPanel, question);
+			GUIContentPanel.loadContentPanelForQuestion(super.contentPanel, question);
 		}
 	}
 	
@@ -180,11 +156,11 @@ class GUI2 extends JFrame{
 		@Override
 		public void mouseClicked(MouseEvent e){
 			super.mouseClicked(e);
-			loadContentPanelForTable(super.contentPanel, table);
+			GUIContentPanel.loadContentPanelForTable(super.contentPanel, table);
 		}
 	}
 	
-	private class PanelItem extends JPanel implements MouseListener{
+	public static class PanelItem extends JPanel implements MouseListener{
 		private final Border marginBorder = new EmptyBorder(0, 15, 0, 0);
 		private final CompoundBorder raisedButtonBorder;
 		private final CompoundBorder loweredButtonBorder;
@@ -206,13 +182,11 @@ class GUI2 extends JFrame{
 		
 		@Override
 		public void mouseClicked(MouseEvent e){
-			if(selectedItem != null)
-				selectedItem.unSelect();
-			selectedItem = this;
+			GUIContentPanel.swapSelectedItem(this);
 			setBorder(loweredButtonBorder);
 		}
 		
-		private void unSelect(){
+		public void unSelect(){
 			setBorder(raisedButtonBorder);
 		}
 		

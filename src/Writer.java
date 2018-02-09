@@ -9,6 +9,7 @@ class Writer{
 		String originalFilePath = file.getParentFile().toString();
 		String projectCode = file.getName().replace(".ASC", "");
 		try{
+			System.out.println(originalFilePath + "\\" + projectCode);
 			writer = new PrintWriter(originalFilePath + "\\" + projectCode + "_test" + ".e");
 		}catch(FileNotFoundException e){
 			return;

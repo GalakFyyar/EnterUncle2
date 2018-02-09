@@ -2,7 +2,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 class EFileModel{
@@ -14,30 +13,35 @@ class EFileModel{
 	}
 	
 	static void convertQuestionsToTables(ArrayList<Question> regQuestions, ArrayList<Question> demoQuestions){
-		ArrayList<Question> filteredQuestions = filterOutBadQuestions(regQuestions);
 		int number = 1;
-		for(Question fq : filteredQuestions){
+		ArrayList<Question> filteredRegQuestions = filterOutBadRegQuestions(regQuestions);
+		for(Question frq : filteredRegQuestions){
 			ArrayList<String[]> choiceRows = new ArrayList<>();
-			for(String[] choice : fq.choices){
+			for(String[] choice : frq.choices){
 				String[] row = new String[2];
 				row[0] = choice[1];
 				row[1] = choice[0];
 				choiceRows.add(row);
 			}
 			
-			
-			tables.add(new Table(number++, null, null, fq.label, null, choiceRows));
+			tables.add(new Table(number++, null, null, frq.label, null, choiceRows));
+		}
+		
+		
+		ArrayList<Question> filteredDemoQuestions = filterOutBadDemoQuestions(regQuestions);
+		for(Question fdq : filteredDemoQuestions){
+			tables.add(new Table(number++, null, null, fdq.label, null,fdq.choices));
 		}
 	}
 	
-	private static ArrayList<Question> filterOutBadQuestions(ArrayList<Question> questions){
-		ArrayList<Question> r = new ArrayList<>();
+	private static ArrayList<Question> filterOutBadRegQuestions(ArrayList<Question> questions){
+		ArrayList<Question> r;
 		
 		r = questions.stream()
 			.filter(q -> !q.label.isEmpty())										//filter questions with label
-			.filter(q -> q.choices.isEmpty())										//remove questions with no choices
-			.filter(q -> q.variable.charAt(0) == 'R')								//hopefully only removes recruit questions
-			.filter(q -> unwantedVariables.contains(q.variable))					//remove unwanted variables
+			.filter(q -> !q.choices.isEmpty())										//remove questions with no choices
+			.filter(q -> q.variable.charAt(0) != 'R')								//hopefully only removes recruit questions
+			.filter(q -> !unwantedVariables.contains(q.variable))					//remove unwanted variables
 			.collect(Collectors.toCollection(ArrayList::new));
 		
 //		Function<String, Boolean> testHearAgain = label -> {
@@ -46,6 +50,16 @@ class EFileModel{
 //		};
 //		questions.forEach(q -> q.choices.removeIf(choice -> testHearAgain.apply(choice[1])));
 		
+		return r;
+	}
+	
+	private static ArrayList<Question> filterOutBadDemoQuestions(ArrayList<Question> questions){
+		ArrayList<Question> r;
+		
+		r = questions.stream()
+		.filter(q -> !q.label.isEmpty())										//filter questions with label
+		.collect(Collectors.toCollection(ArrayList::new));
+
 		return r;
 	}
 }
