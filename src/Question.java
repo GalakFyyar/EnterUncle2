@@ -5,7 +5,6 @@ class Question{
 	int codeWidth;
 	String label;
 	String identifier;
-	String position;	//Position in TXT file
 	int quePosition;	//Position in ASC file, maybe unnecessary, if no questions are removed, then this value will be the same as this object's index in the question list
 	String shortLabel;
 	String skipCondition;

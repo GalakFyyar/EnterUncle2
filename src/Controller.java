@@ -7,10 +7,6 @@ class Controller{
 		errorMessage = err;
 	}
 	
-	static int getStartingPosition(){
-		return QuestionnaireModel.getStartingPosition();
-	}
-	
 	static void clearQuestionnaire(){
 		QuestionnaireModel.clearQuestions();
 	}

@@ -23,6 +23,9 @@ class GUI2 extends JFrame{
 	private static final int FRAME_HEIGHT = 480;
 	private static File ascFile = null;
 	
+	private static PanelItem selectedItem;
+	private static final GUIContentPanel contentPanel = new GUIContentPanel();
+	
 	GUI2(){
 		try{
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -99,21 +102,19 @@ class GUI2 extends JFrame{
 		ArrayList<Table> tables = Controller.getTables();
 		mainPanel.setLayout(new BorderLayout());
 		
-		JPanel contentPanel = new JPanel(new BorderLayout());
-		
 		
 		//TODO -- add ImageIcon icon createImageIcon();
 		JPanel questionPanel = new JPanel();					//Goes on the left!
 		questionPanel.setLayout(new GridLayout(questions.size(), 1));
-		questions.forEach(q -> questionPanel.add(new QuestionPanelItem(contentPanel, q)));
+		questions.forEach(q -> questionPanel.add(new QuestionPanelItem(q)));
 		JScrollPane leftScrollPane = new JScrollPane(questionPanel);
 		leftScrollPane.getVerticalScrollBar().setUnitIncrement(16);
 		leftScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		
 		
-		JPanel tablePanel = new JPanel();					//Goes on the right
-		tablePanel.setLayout(new GridLayout(questions.size(), 1));
-		tables.forEach(t -> tablePanel.add(new TablePanelItem(contentPanel, t)));
+		JPanel tablePanel = new JPanel();					//Goes on the right!
+		tablePanel.setLayout(new GridLayout(tables.size(), 1));
+		tables.forEach(t -> tablePanel.add(new TablePanelItem(t)));
 		JScrollPane rightScrollPane = new JScrollPane(tablePanel);
 		rightScrollPane.getVerticalScrollBar().setUnitIncrement(16);
 		rightScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -130,33 +131,41 @@ class GUI2 extends JFrame{
 		return ascFile;
 	}
 	
+	
+	static void swapSelectedItem(GUI2.PanelItem panelItem){
+		if(selectedItem != null)
+			selectedItem.unSelect();
+		selectedItem = panelItem;
+		
+	}
+	
 	private class QuestionPanelItem extends PanelItem{
 		private Question question;
 		
-		QuestionPanelItem(JPanel aContentPanel, Question q){
-			super(aContentPanel, q.variable);
+		QuestionPanelItem(Question q){
+			super(q.variable);
 			question = q;
 		}
 		
 		@Override
 		public void mouseClicked(MouseEvent e){
 			super.mouseClicked(e);
-			GUIContentPanel.loadContentPanelForQuestion(super.contentPanel, question);
+			GUIContentPanel.loadContentPanelForQuestion(question);
 		}
 	}
 	
 	private class TablePanelItem extends PanelItem{
 		private Table table;
 		
-		TablePanelItem(JPanel aContentPanel, Table t){
-			super(aContentPanel, "TABLE " + t.number);
+		TablePanelItem(Table t){
+			super("TABLE " + t.number + " - " + (t.title.length() < 20 ? t.title : t.title.substring(0, 20)));
 			table = t;
 		}
 		
 		@Override
 		public void mouseClicked(MouseEvent e){
 			super.mouseClicked(e);
-			GUIContentPanel.loadContentPanelForTable(super.contentPanel, table);
+			GUIContentPanel.loadContentPanelForTable(table);
 		}
 	}
 	
@@ -164,9 +173,8 @@ class GUI2 extends JFrame{
 		private final Border marginBorder = new EmptyBorder(0, 15, 0, 0);
 		private final CompoundBorder raisedButtonBorder;
 		private final CompoundBorder loweredButtonBorder;
-		private JPanel contentPanel;
 		
-		PanelItem(JPanel aContentPanel, String item){
+		PanelItem(String item){
 			super(new BorderLayout());
 			raisedButtonBorder = new CompoundBorder(BorderFactory.createRaisedBevelBorder(), marginBorder);
 			loweredButtonBorder = new CompoundBorder(BorderFactory.createLoweredBevelBorder(), marginBorder);
@@ -177,12 +185,11 @@ class GUI2 extends JFrame{
 			add(new JLabel(item));
 			
 			addMouseListener(this);
-			contentPanel = aContentPanel;
 		}
 		
 		@Override
 		public void mouseClicked(MouseEvent e){
-			GUIContentPanel.swapSelectedItem(this);
+			swapSelectedItem(this);
 			setBorder(loweredButtonBorder);
 		}
 		

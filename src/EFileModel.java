@@ -1,10 +1,9 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 class EFileModel{
+	private static final int START_POS = 248;
+	
 	private static final ArrayList<Table> tables = new ArrayList<>();
 	private static final Set<String> unwantedVariables = new HashSet<>(Arrays.asList("TZONE", "LOC", "LDF", "LDE", "AREA", "FSA", "FSA1", "LANG", "IT2", "S1", "S2", "S3", "INT01", "INT02", "INT99", "C3", "INT"));//todo: make extendable
 	
@@ -13,30 +12,63 @@ class EFileModel{
 	}
 	
 	static void convertQuestionsToTables(ArrayList<Question> regQuestions, ArrayList<Question> demoQuestions){
+		Map<String, Integer> positionsOfAllQuestions = calcPositions(regQuestions, demoQuestions);
+		
 		int number = 1;
 		ArrayList<Question> filteredRegQuestions = filterOutBadRegQuestions(regQuestions);
 		for(Question frq : filteredRegQuestions){
-			ArrayList<String[]> choiceRows = new ArrayList<>();
-			for(String[] choice : frq.choices){
-				String[] row = new String[2];
-				row[0] = choice[1];
-				row[1] = choice[0];
-				choiceRows.add(row);
-			}
+			int numOfChoices = frq.choices.size();
+			String[] labels = new String[numOfChoices];
+			int[] positions = new int[numOfChoices];
+			String[] codes = new String[numOfChoices];
+			int position = positionsOfAllQuestions.get(frq.variable);
 			
-			tables.add(new Table(number++, null, null, frq.label, null, choiceRows));
+			initChoiceArrays(frq.choices, numOfChoices, position, labels, positions, codes);
+			
+			tables.add(new Table(number++, frq.label, "", labels, positions, codes));
 		}
 		
 		
-		ArrayList<Question> filteredDemoQuestions = filterOutBadDemoQuestions(regQuestions);
+		ArrayList<Question> filteredDemoQuestions = filterOutBadDemoQuestions(demoQuestions);
 		for(Question fdq : filteredDemoQuestions){
-			tables.add(new Table(number++, null, null, fdq.label, null,fdq.choices));
+			int numOfChoices = fdq.choices.size();
+			String[] labels = new String[numOfChoices];
+			int[] positions = new int[numOfChoices];
+			String[] codes = new String[numOfChoices];
+			int position = positionsOfAllQuestions.get(fdq.variable);
+
+			initChoiceArrays(fdq.choices, numOfChoices, position, labels, positions, codes);
+
+			
+			tables.add(new Table(number++, fdq.label, null, labels, positions, codes));
+		}
+	}
+	
+	private static Map<String, Integer> calcPositions(ArrayList<Question> regQuestions, ArrayList<Question> demoQuestions){
+		Map<String, Integer> positionsOfQuestions = new HashMap<>();
+		int pos = START_POS;
+		for(Question rq : regQuestions){
+			positionsOfQuestions.put(rq.variable, pos);
+			pos += rq.codeWidth;
+		}
+		for(Question dq : demoQuestions){
+			positionsOfQuestions.put(dq.variable, pos);
+			pos += dq.codeWidth;
+		}
+		return positionsOfQuestions;
+	}
+	
+	private static void initChoiceArrays(ArrayList<String[]> choices, int len, int position, String[] labels, int[] positions, String[] codes){
+		for(int i = 0; i < len; i++){
+			labels[i] = choices.get(i)[1];
+			positions[i] = position;
+			codes[i] = choices.get(i)[0];
 		}
 	}
 	
 	private static ArrayList<Question> filterOutBadRegQuestions(ArrayList<Question> questions){
 		ArrayList<Question> r;
-		
+		//Try RemoveIf instead of filter?
 		r = questions.stream()
 			.filter(q -> !q.label.isEmpty())										//filter questions with label
 			.filter(q -> !q.choices.isEmpty())										//remove questions with no choices

@@ -8,12 +8,7 @@ class QuestionnaireModel{
 	private static final ArrayList<Question> regQuestions = new ArrayList<>();
 	private static final ArrayList<Question> demoQuestions = new ArrayList<>();
 	private static final Map<String, Question> questionMap = new HashMap<>();
-	private static final int START_POS = 248;
 	private static String location = "";
-	
-	static int getStartingPosition(){
-		return START_POS;
-	}
 	
 	public static String getLocation(){
 		return location;
@@ -57,12 +52,7 @@ class QuestionnaireModel{
 			}
 		}
 		
-		int pos = START_POS;
 		for(Question q : questions){
-			//Calculate position
-			q.position = pos + "-";
-			pos += q.codeWidth;
-			
 			//Mark demographic questions
 			if(q.variable.charAt(0) == 'D'){
 				demoQuestions.add(q);
@@ -104,7 +94,7 @@ class QuestionnaireModel{
 				return false;
 			}
 			
-			//remove hear choices
+			//remove hear again choices
 			Iterator<String[]> choiceIterator = q.choices.iterator();
 			while(choiceIterator.hasNext()){
 				String[] choice = choiceIterator.next();
@@ -177,7 +167,6 @@ class QuestionnaireModel{
 		else
 			System.out.println("EMPTY LABEL");
 		System.out.println(q.identifier);
-		System.out.println(q.position);
 		for(String[] c : q.choices)
 			System.out.println(c[0] + "|--|" + c[1]);
 		System.out.println();
