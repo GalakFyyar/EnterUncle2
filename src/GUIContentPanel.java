@@ -14,10 +14,10 @@ class GUIContentPanel extends JPanel{
 	
 	GUIContentPanel(){
 		super(layout);
+		add(new JPanel(), "Blank");         //Default card, appears only at beginning when neither question nor table has been selected
 		add(questionPanel, QUESTION_CARD);
 		add(tablePanel, TABLE_CARD);
 		singleton = this;
-		System.out.println(getSize());
 	}
 	
 	static void loadContentPanelForQuestion(Question q){
@@ -26,21 +26,8 @@ class GUIContentPanel extends JPanel{
 	}
 	
 	static void loadContentPanelForTable(Table t){
-		singleton.removeAll();
-		
-		JTextField titleField = new JTextField(t.title);
-		titleField.setMinimumSize(new Dimension(0, 200));
-		
-		String[] titles = new String[]{"Label", "Position", "Extras"};
-		JTable rowsTable = new JTable(t.rows, titles);
-		
-		JScrollPane rowsPane = new JScrollPane(rowsTable);
-		rowsPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		
-		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, titleField, rowsPane);
-		
-		singleton.add(splitPane);
-		singleton.revalidate();
+		tablePanel.loadContent(t);
+		layout.show(singleton, TABLE_CARD);
 	}
 	
 	static class QuestionPanel extends JPanel implements TableModelListener{
@@ -49,7 +36,7 @@ class GUIContentPanel extends JPanel{
 		private final String[] titles = new String[]{"Code", "Label", "Destination"};
 		
 		QuestionPanel(){
-			super();
+			super(new BorderLayout());
 			labelField = new JTextField();
 			labelField.setMinimumSize(new Dimension(0, 200));
 			
@@ -83,18 +70,21 @@ class GUIContentPanel extends JPanel{
 		}
 	}
 	
-	static class TablePanel extends JPanel{
+	static class TablePanel extends JPanel implements TableModelListener{
 		private final JTextField titleField;
-		private final JTable rowsTable;
+		private final JTable rowsAndColumnsTable;
 		private final String[] titles = new String[]{"Label", "Position", "Extras"};
 		
 		TablePanel(){
+			super(new BorderLayout());
 			titleField = new JTextField();
 			titleField.setMinimumSize(new Dimension(0, 200));
 			
-			rowsTable = new JTable(new String[0][0], titles);
+			rowsAndColumnsTable = new JTable(new String[0][0], titles);
+			rowsAndColumnsTable.setModel(new DefaultTableModel());
+			rowsAndColumnsTable.getModel().addTableModelListener(this);
 			
-			JScrollPane rowsPane = new JScrollPane(rowsTable);
+			JScrollPane rowsPane = new JScrollPane(rowsAndColumnsTable);
 			rowsPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 			
 			JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, titleField, rowsPane);
@@ -102,16 +92,17 @@ class GUIContentPanel extends JPanel{
 			add(splitPane);
 		}
 		
-		void loadContent(Table q){
-//			labelField.setText(q.label);
-//			int len = q.choices.size();
-//			String[][] choices = new String[len][];
-//			for(int i = 0; i < len; i++){
-//				choices[i] = q.choices.get(i);
-//			}
-//			DefaultTableModel tm = (DefaultTableModel) choicesTable.getModel();
-//			tm.getDataVector().removeAllElements();
-//			tm.setDataVector(choices, titles);
+		void loadContent(Table t){
+			titleField.setText(t.title);
+			DefaultTableModel tm = (DefaultTableModel) rowsAndColumnsTable.getModel();
+			tm.getDataVector().removeAllElements();
+			tm.setDataVector(t.rows, titles);
+		}
+		
+		@Override
+		public void tableChanged(TableModelEvent e){
+			//Data changed
+			//System.out.println(e.toString());
 		}
 	}
 }

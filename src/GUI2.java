@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 class GUI2 extends JFrame{
-	private static final String VERSION = "2.0";
+	private static final String VERSION = "2.0.1";
 	private static final long serialVersionUID = 1L;
 	private static final int FRAME_WIDTH = 720;
 	private static final int FRAME_HEIGHT = 480;
