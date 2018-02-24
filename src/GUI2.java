@@ -10,11 +10,14 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiFunction;
 
 class GUI2 extends JFrame{
 	private static final String VERSION = "2.0.1";
@@ -51,12 +54,22 @@ class GUI2 extends JFrame{
 	
 	private void loadMenuBar(JFrame context){
 		JMenuBar menuBar = new JMenuBar();
-		
 		JMenu fileMenu = new JMenu("File");
-		JMenuItem openFileItem = new JMenuItem("Open...");
-		fileMenu.add(openFileItem);
-		JMenuItem saveFileItem = new JMenuItem("Save");
-		fileMenu.add(saveFileItem);
+		
+		BiFunction<JMenu, String, JMenuItem> createJMenuItem = (menu, name) -> {
+			JMenuItem item = new JMenuItem(name);
+			menu.add(item);
+			return item;
+		};
+		
+		JMenuItem openFileMenuItem   = createJMenuItem.apply(fileMenu, "Open...");
+		JMenuItem saveFileMenuItem   = createJMenuItem.apply(fileMenu, "Save");
+		JMenuItem exportFileMenuItem = createJMenuItem.apply(fileMenu, "Export");
+		fileMenu.addSeparator();
+		JMenuItem exitFileMenuItem   = createJMenuItem.apply(fileMenu, "Exit");
+		
+		ActionListener menuListener = new MenuListener(openFileMenuItem, saveFileMenuItem, exportFileMenuItem, exitFileMenuItem);
+		
 		menuBar.add(fileMenu);
 		
 		JMenu optionsMenu = new JMenu("Options");
@@ -169,7 +182,7 @@ class GUI2 extends JFrame{
 		}
 	}
 	
-	public static class PanelItem extends JPanel implements MouseListener{
+	private static class PanelItem extends JPanel implements MouseListener{
 		private final Border marginBorder = new EmptyBorder(0, 15, 0, 0);
 		private final CompoundBorder raisedButtonBorder;
 		private final CompoundBorder loweredButtonBorder;
@@ -215,6 +228,41 @@ class GUI2 extends JFrame{
 		@Override
 		public void mouseExited(MouseEvent e){
 		
+		}
+	}
+	
+	public static class MenuListener implements ActionListener{
+		JMenuItem open;
+		JMenuItem save;
+		JMenuItem export;
+		JMenuItem exit;
+		
+		 MenuListener(JMenuItem open, JMenuItem save, JMenuItem export, JMenuItem exit){
+			super();
+			
+			open.addActionListener(this);
+			save.addActionListener(this);
+			export.addActionListener(this);
+			exit.addActionListener(this);
+			
+			this.open = open;
+			this.save = save;
+			this.export = export;
+			this.exit = exit;
+		}
+		
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if (e.getSource() == open){
+				System.out.println("open");
+			}else if (e.getSource() == save){
+				System.out.println("save");
+			}else if (e.getSource() == export){
+				System.out.println("export");
+			}else if(e.getSource() == exit){
+				System.out.println("exit");
+				System.exit(0);
+			}
 		}
 	}
 }
