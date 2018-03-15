@@ -4,12 +4,12 @@ import java.util.Scanner;
 
 class Parser{
 	//returns true for success, false otherwise
-	static boolean parse(String filePath){
+	static boolean parse(File ascFile){
 		Scanner sc;
 		try{
-			sc = new Scanner(new File(filePath), "UTF-8");
+			sc = new Scanner(ascFile, "UTF-8");
 		}catch(Exception e){
-			Controller.setErrorMessage("Can't open .ASC file\n" + e.getMessage());
+			Controller.throwErrorMessage("Can't open .ASC file\n" + e.getMessage());
 			return false;
 		}
 		
@@ -34,12 +34,14 @@ class Parser{
 				break;
 			}
 			
+			boolean labelFound = false;
 			//This is the order these commands appear in .ASC files
 			if(line.startsWith("*ME")){			//Message to the Interviewer Found
 				sc.nextLine();//do nothing
 				line = sc.nextLine();
 			}
 			if(line.startsWith("*LL")){			//Long Label Found
+				labelFound = true;
 				String rawVariable = line;
 				StringBuilder labelBuilder = new StringBuilder(sc.nextLine());
 				while(!labelBuilder.toString().endsWith("]")){		//if multiple lines
@@ -83,6 +85,14 @@ class Parser{
 					rawChoice = sc.nextLine();
 				}while(!rawChoice.startsWith("---"));
 				line = sc.nextLine();
+			}
+			
+			//If no label was found this indicates that the file is not a properly formatted .ASC file
+			if(!labelFound){
+				sc.close();
+				Controller.clearQuestionnaire();
+				Controller.throwErrorMessage("Could not parse .ASC file");
+				return false;
 			}
 			
 			Controller.addQuestion(variable, codeWidth, label, quePosition, shortLabel, ifDestination, elseDestination, skipCondition, choices);

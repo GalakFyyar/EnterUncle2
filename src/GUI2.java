@@ -20,27 +20,28 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 class GUI2 extends JFrame{
+	private static GUI2 singleton;
 	private static final String VERSION = "2.0.1";
 	private static final long serialVersionUID = 1L;
 	private static final int FRAME_WIDTH = 720;
 	private static final int FRAME_HEIGHT = 480;
 	private static File ascFile = null;
 	
+	private static ButtonListener buttonlistener;
 	private static PanelItem selectedItem;
 	private static final GUIContentPanel contentPanel = new GUIContentPanel();
 	
 	GUI2(){
+		singleton = this;
 		try{
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		}catch(Exception ignored){}
 		
-		//Menu Bar
 		loadMenuBar(this);
 		
 		JPanel mainPanel = new JPanel(new BorderLayout());
 		
-		//Load Components on mainPanel
-		loadFileArea(mainPanel);
+		loadInitScreen(mainPanel);
 		
 		getContentPane().add(mainPanel);
 		setTitle("Enter Uncle v" + VERSION);
@@ -68,7 +69,7 @@ class GUI2 extends JFrame{
 		fileMenu.addSeparator();
 		JMenuItem exitFileMenuItem   = createJMenuItem.apply(fileMenu, "Exit");
 		
-		ActionListener menuListener = new MenuListener(openFileMenuItem, saveFileMenuItem, exportFileMenuItem, exitFileMenuItem);
+		new MenuListener(openFileMenuItem, saveFileMenuItem, exportFileMenuItem, exitFileMenuItem);
 		
 		menuBar.add(fileMenu);
 		
@@ -80,7 +81,16 @@ class GUI2 extends JFrame{
 		context.setJMenuBar(menuBar);
 	}
 	
-	private void loadFileArea(JPanel mainPanel){
+	private void loadInitScreen(JPanel mainPanel){
+		JPanel buttonPanel = new JPanel();
+		JButton exportButton = new JButton("Export to E");
+		buttonlistener = new ButtonListener(exportButton);
+		buttonlistener.disableButtons();
+		buttonPanel.add(exportButton);
+		
+		mainPanel.add(buttonPanel, BorderLayout.NORTH);
+		
+		JPanel lowerMainPanel = new JPanel(new BorderLayout());
 		JDesktopPane fileArea = new JDesktopPane();
 		fileArea.setToolTipText("Drag files onto here");
 		fileArea.setBackground(Color.DARK_GRAY);
@@ -93,27 +103,30 @@ class GUI2 extends JFrame{
 					List<File> droppedFiles = (List<File>)evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
 					ascFile = droppedFiles.get(0);
 				}catch(Exception ex){
-					Controller.setErrorMessage("Drag and Drop Error");
+					throwErrorMessage("Drag and Drop Error");
 					ex.printStackTrace();
 				}
 				
 				if(ascFile != null){
-					Controller.parseASCFileAndPopulateQuestionnaireModel(ascFile.getAbsolutePath());
-					Controller.populateEFileModel();
-					loadMainPanel(mainPanel);
+					boolean parseSuccess = Controller.parseASCFileAndPopulateQuestionnaireModel(ascFile);
+					if(parseSuccess){
+						Controller.populateEFileModel();
+						loadLowerMainPanelWithQuestions(lowerMainPanel);
+					}
 				}
 			}
 		};
 		fileArea.setDropTarget(qaxDropTarget);
 		
-		mainPanel.add(fileArea);
+		lowerMainPanel.add(fileArea);
+		mainPanel.add(lowerMainPanel, BorderLayout.CENTER);
 	}
 	
-	private void loadMainPanel(JPanel mainPanel){
-		mainPanel.removeAll();
+	private void loadLowerMainPanelWithQuestions(JPanel lowerMainPanel){
+		lowerMainPanel.removeAll();
 		ArrayList<Question> questions = Controller.getAllQuestions();
 		ArrayList<Table> tables = Controller.getTables();
-		mainPanel.setLayout(new BorderLayout());
+		lowerMainPanel.setLayout(new BorderLayout());
 		
 		
 		//TODO -- add ImageIcon icon createImageIcon();
@@ -132,24 +145,25 @@ class GUI2 extends JFrame{
 		rightScrollPane.getVerticalScrollBar().setUnitIncrement(16);
 		rightScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		
-		mainPanel.add(leftScrollPane, BorderLayout.WEST);
-		mainPanel.add(rightScrollPane, BorderLayout.EAST);
-		mainPanel.add(contentPanel, BorderLayout.CENTER);
+		lowerMainPanel.add(leftScrollPane, BorderLayout.WEST);
+		lowerMainPanel.add(rightScrollPane, BorderLayout.EAST);
+		lowerMainPanel.add(contentPanel, BorderLayout.CENTER);
 		
-		mainPanel.revalidate();
-		mainPanel.repaint();
+		lowerMainPanel.revalidate();
+		lowerMainPanel.repaint();
+		
+		buttonlistener.enableButtons();
 	}
-	
-	static File getASCFile(){
-		return ascFile;
-	}
-	
 	
 	static void swapSelectedItem(GUI2.PanelItem panelItem){
 		if(selectedItem != null)
 			selectedItem.unSelect();
 		selectedItem = panelItem;
 		
+	}
+	
+	static void throwErrorMessage(String err){
+		JOptionPane.showMessageDialog(singleton, err, "Error", JOptionPane.ERROR_MESSAGE);
 	}
 	
 	private class QuestionPanelItem extends PanelItem{
@@ -200,14 +214,14 @@ class GUI2 extends JFrame{
 			addMouseListener(this);
 		}
 		
+		void unSelect(){
+			setBorder(raisedButtonBorder);
+		}
+		
 		@Override
 		public void mouseClicked(MouseEvent e){
 			swapSelectedItem(this);
 			setBorder(loweredButtonBorder);
-		}
-		
-		public void unSelect(){
-			setBorder(raisedButtonBorder);
 		}
 		
 		@Override
@@ -253,15 +267,44 @@ class GUI2 extends JFrame{
 		
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if (e.getSource() == open){
+			if(e.getSource() == open){
 				System.out.println("open");
-			}else if (e.getSource() == save){
+			}else if(e.getSource() == save){
 				System.out.println("save");
-			}else if (e.getSource() == export){
+			}else if(e.getSource() == export){
 				System.out.println("export");
+				Controller.write(ascFile);
 			}else if(e.getSource() == exit){
 				System.out.println("exit");
 				System.exit(0);
+			}
+		}
+	}
+	
+	public static class ButtonListener implements ActionListener{
+		JButton export;
+		
+		ButtonListener(JButton export){
+			super();
+			
+			export.addActionListener(this);
+			
+			this.export = export;
+		}
+		
+		void disableButtons(){
+			export.setEnabled(false);
+		}
+		
+		void enableButtons(){
+			export.setEnabled(true);
+		}
+		
+		@Override
+		public void actionPerformed(ActionEvent e){
+			if(e.getSource() == export){
+				System.out.println("export");
+				Controller.write(ascFile);
 			}
 		}
 	}

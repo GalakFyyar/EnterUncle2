@@ -1,10 +1,9 @@
+import java.io.File;
 import java.util.ArrayList;
 
 class Controller{
-	private static String errorMessage = "";
-	
-	static void setErrorMessage(String err){
-		errorMessage = err;
+	static void throwErrorMessage(String err){
+		GUI2.throwErrorMessage(err);
 	}
 	
 	static void clearQuestionnaire(){
@@ -16,8 +15,8 @@ class Controller{
 	}
 	
 	//Parse the .ASC file, then the questionnaireModel will populate some more Question fields
-	static boolean parseASCFileAndPopulateQuestionnaireModel(String filePath){
-		boolean parseSuccess = Parser.parse(filePath);
+	static boolean parseASCFileAndPopulateQuestionnaireModel(File file){
+		boolean parseSuccess = Parser.parse(file);
 		boolean finalizeSuccess = QuestionnaireModel.secondPassParsing();
 		return parseSuccess && finalizeSuccess;
 	}
@@ -38,10 +37,6 @@ class Controller{
 		return EFileModel.getTables();
 	}
 	
-	static String getErrorMessage(){
-		return errorMessage;
-	}
-	
 	static void addQuestion(String variable, int codeWidth, String label, int quePosition, String shortLabel, String ifDestination, String elseDestination, String skipCondition, ArrayList<String[]> choices){
 		QuestionnaireModel.addQuestion(variable, codeWidth, label, quePosition, shortLabel, ifDestination, elseDestination, skipCondition, choices);
 	}
@@ -52,7 +47,7 @@ class Controller{
 		EFileModel.convertQuestionsToTables(regQuestions, demoQuestions);
 	}
 	
-	static void write(){
-		Writer.writeFile(GUI2.getASCFile(), EFileModel.getTables());
+	static void write(File ascFile){
+		Writer.writeFile(ascFile, EFileModel.getTables());
 	}
 }

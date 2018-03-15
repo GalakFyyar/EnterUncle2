@@ -80,7 +80,7 @@ class QuestionnaireModel{
 			if(ifSkip != null)
 				q.ifSkip = ifSkip;
 			else{
-				Controller.setErrorMessage("Could not find skip destination :\"" + q.ifDestination + "\" in question " + q.variable);
+				Controller.throwErrorMessage("Could not find skip destination :\"" + q.ifDestination + "\" in question " + q.variable);
 				System.out.println("null");
 				return false;
 			}
@@ -89,7 +89,7 @@ class QuestionnaireModel{
 			if(elseSkip != null)
 				q.elseSkip = elseSkip;
 			else{
-				Controller.setErrorMessage("Could not find skip destination :\"" + q.elseDestination + "\" in question " + q.variable);
+				Controller.throwErrorMessage("Could not find skip destination :\"" + q.elseDestination + "\" in question " + q.variable);
 				System.out.println("null");
 				return false;
 			}
@@ -123,8 +123,8 @@ class QuestionnaireModel{
 		
 		return true;
 	}
-	//This method converts the skip destination to an integer.
 	
+	//This method converts the skip destination to an integer.
 	//Skip destination may allready be a number or blank or a name to another variable
 	//Skip destination may not contain slashes '/' pluses '+' or stars '*'
 	private static Integer setSkipPosition(String skipDestination, int quePosition){
