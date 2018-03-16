@@ -20,7 +20,7 @@ class Writer{
 			writer.println("TABLE " + t.number);
 			
 			writer.println("T " + t.title);
-			writer.println("T &wt" + t.excelWorksheetTitle);
+			writer.println("T &wt " + t.excelWorksheetTitle);
 			
 			for(String[] r : t.rows){
 				writer.println("R " + r[0] + "; " + r[1]);

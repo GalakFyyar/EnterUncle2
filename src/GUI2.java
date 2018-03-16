@@ -166,7 +166,7 @@ class GUI2 extends JFrame{
 		JOptionPane.showMessageDialog(singleton, err, "Error", JOptionPane.ERROR_MESSAGE);
 	}
 	
-	private class QuestionPanelItem extends PanelItem{
+	private static class QuestionPanelItem extends PanelItem{
 		private Question question;
 		
 		QuestionPanelItem(Question q){
@@ -181,7 +181,7 @@ class GUI2 extends JFrame{
 		}
 	}
 	
-	private class TablePanelItem extends PanelItem{
+	private static class TablePanelItem extends PanelItem{
 		private Table table;
 		
 		TablePanelItem(Table t){
@@ -245,7 +245,7 @@ class GUI2 extends JFrame{
 		}
 	}
 	
-	public static class MenuListener implements ActionListener{
+	private static class MenuListener implements ActionListener{
 		JMenuItem open;
 		JMenuItem save;
 		JMenuItem export;
@@ -281,7 +281,7 @@ class GUI2 extends JFrame{
 		}
 	}
 	
-	public static class ButtonListener implements ActionListener{
+	private static class ButtonListener implements ActionListener{
 		JButton export;
 		
 		ButtonListener(JButton export){

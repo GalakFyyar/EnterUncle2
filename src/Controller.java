@@ -44,7 +44,7 @@ class Controller{
 	static void populateEFileModel(){
 		ArrayList<Question> regQuestions = QuestionnaireModel.getRegQuestions();
 		ArrayList<Question> demoQuestions = QuestionnaireModel.getDemoQuestions();
-		EFileModel.convertQuestionsToTables(regQuestions, demoQuestions);
+		EFileModel.init(regQuestions, demoQuestions);
 	}
 	
 	static void write(File ascFile){

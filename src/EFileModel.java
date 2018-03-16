@@ -11,7 +11,7 @@ class EFileModel{
 		return tables;
 	}
 	
-	static void convertQuestionsToTables(ArrayList<Question> regQuestions, ArrayList<Question> demoQuestions){
+	static void init(ArrayList<Question> regQuestions, ArrayList<Question> demoQuestions){
 		Map<String, Integer> positionsOfAllQuestions = calcPositions(regQuestions, demoQuestions);
 		
 		int number = 1;
@@ -23,9 +23,9 @@ class EFileModel{
 			String[] codes = new String[numOfChoices];
 			int position = positionsOfAllQuestions.get(frq.variable);
 			
-			initChoiceArrays(frq.choices, numOfChoices, position, labels, positions, codes);
-			
-			tables.add(new Table(number++, frq.label, "", labels, positions, codes));
+			initRowArrays(frq.choices, numOfChoices, position, labels, positions, codes);
+			String excelWorksheetTitle = getExcelWorksheetTitle(frq.label, frq.variable);
+			tables.add(new Table(number++, frq.label, excelWorksheetTitle, labels, positions, codes));
 		}
 		
 		
@@ -37,10 +37,10 @@ class EFileModel{
 			String[] codes = new String[numOfChoices];
 			int position = positionsOfAllQuestions.get(fdq.variable);
 
-			initChoiceArrays(fdq.choices, numOfChoices, position, labels, positions, codes);
+			initRowArrays(fdq.choices, numOfChoices, position, labels, positions, codes);
 
 			
-			tables.add(new Table(number++, fdq.label, null, labels, positions, codes));
+			tables.add(new Table(number++, fdq.label, fdq.variable, labels, positions, codes));
 		}
 	}
 	
@@ -58,7 +58,7 @@ class EFileModel{
 		return positionsOfQuestions;
 	}
 	
-	private static void initChoiceArrays(ArrayList<String[]> choices, int len, int position, String[] labels, int[] positions, String[] codes){
+	private static void initRowArrays(ArrayList<String[]> choices, int len, int position, String[] labels, int[] positions, String[] codes){
 		for(int i = 0; i < len; i++){
 			labels[i] = choices.get(i)[1];
 			positions[i] = position;
@@ -93,5 +93,17 @@ class EFileModel{
 		.collect(Collectors.toCollection(ArrayList::new));
 
 		return r;
+	}
+	
+	private static String getExcelWorksheetTitle(String label, String variable){
+		int delimiter = label.indexOf(".");		//find first period
+		
+		if(delimiter == -1 || delimiter > 9)	//if period not found or too far away then
+			delimiter = label.indexOf(" ");		//use first space instead
+		
+		if(delimiter == -1){					//if space not found either, just use the variable
+			return variable;
+		}else
+			return "Q" + label.substring(0, delimiter).toUpperCase();
 	}
 }
