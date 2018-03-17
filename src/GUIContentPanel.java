@@ -100,9 +100,18 @@ class GUIContentPanel extends JPanel{
 		}
 		
 		@Override
+		//Happens whenever the Table data is created or changed
 		public void tableChanged(TableModelEvent e){
-			//Data changed
-			//System.out.println(e.toString());
+			int column = e.getColumn();
+			int row = e.getFirstRow();
+			
+			if(column == -1){
+				System.out.println("?");
+			}
+			
+			System.out.println(column);
+			System.out.println(row);
+			
 		}
 	}
 }

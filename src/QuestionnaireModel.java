@@ -93,16 +93,6 @@ class QuestionnaireModel{
 				System.out.println("null");
 				return false;
 			}
-			
-			//remove hear again choices
-			Iterator<String[]> choiceIterator = q.choices.iterator();
-			while(choiceIterator.hasNext()){
-				String[] choice = choiceIterator.next();
-				String cl = choice[1].toLowerCase();		//choice label in lowercase
-				if((cl.contains("hear") && cl.contains("again")) || (cl.contains("repeat") && cl.contains("answers"))){
-					choiceIterator.remove();
-				}
-			}
 		}
 		
 		//Determine the identifier of regular questions

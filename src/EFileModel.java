@@ -58,23 +58,21 @@ class EFileModel{
 		return positionsOfQuestions;
 	}
 	
+	//Also capitalizes the labels
 	private static void initRowArrays(ArrayList<String[]> choices, int len, int position, String[] labels, int[] positions, String[] codes){
 		for(int i = 0; i < len; i++){
-			labels[i] = choices.get(i)[1];
+			String rawLabel = choices.get(i)[1];
+			labels[i] = rawLabel.substring(0, 1).toUpperCase() + rawLabel.substring(1);
 			positions[i] = position;
 			codes[i] = choices.get(i)[0];
 		}
 	}
 	
 	private static ArrayList<Question> filterOutBadRegQuestions(ArrayList<Question> questions){
-		ArrayList<Question> r;
-		//Try RemoveIf instead of filter?
-		r = questions.stream()
-			.filter(q -> !q.label.isEmpty())										//filter questions with label
-			.filter(q -> !q.choices.isEmpty())										//remove questions with no choices
-			.filter(q -> q.variable.charAt(0) != 'R')								//hopefully only removes recruit questions
-			.filter(q -> !unwantedVariables.contains(q.variable))					//remove unwanted variables
-			.collect(Collectors.toCollection(ArrayList::new));
+		questions.removeIf(q -> q.label.isEmpty());								//filter questions with label
+		questions.removeIf(q -> q.choices.isEmpty());							//remove questions with no choices
+		questions.removeIf(q -> q.variable.charAt(0) == 'R');					//hopefully only removes recruit questions
+		questions.removeIf(q -> unwantedVariables.contains(q.variable));		//remove unwanted variables
 		
 //		Function<String, Boolean> testHearAgain = label -> {
 //			String l = label.toLowerCase();
@@ -82,7 +80,7 @@ class EFileModel{
 //		};
 //		questions.forEach(q -> q.choices.removeIf(choice -> testHearAgain.apply(choice[1])));
 		
-		return r;
+		return questions;
 	}
 	
 	private static ArrayList<Question> filterOutBadDemoQuestions(ArrayList<Question> questions){
