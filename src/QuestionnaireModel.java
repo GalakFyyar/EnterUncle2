@@ -1,13 +1,12 @@
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 class QuestionnaireModel{
 	private static final ArrayList<Question> questions = new ArrayList<>();
 	private static final ArrayList<Question> regQuestions = new ArrayList<>();
 	private static final ArrayList<Question> demoQuestions = new ArrayList<>();
-	private static final Map<String, Question> questionMap = new HashMap<>();
+	private static final Map<String, Question> questionNameMap = new HashMap<>();		//Variable -> Question
 	private static String location = "";
 	
 	public static String getLocation(){
@@ -37,7 +36,9 @@ class QuestionnaireModel{
 	}
 	
 	static void addQuestion(String variable, int codeWidth, String label, int quePosition, String shortLabel, String ifDestination, String elseDestination, String skipCondition, ArrayList<String[]> choices){
-		questions.add(new Question(variable, codeWidth, label, quePosition, shortLabel, ifDestination, elseDestination, skipCondition, choices));
+		Question q = new Question(variable, codeWidth, label, quePosition, shortLabel, ifDestination, elseDestination, skipCondition, choices);
+		questions.add(q);
+		questionNameMap.put(variable, q);
 	}
 	//returns true for success, false otherwise
 	

@@ -11,40 +11,13 @@ class EFileModel{
 		return tables;
 	}
 	
-	static void init(ArrayList<Question> regQuestions, ArrayList<Question> demoQuestions){
-		Map<String, Integer> positionsOfAllQuestions = calcPositions(regQuestions, demoQuestions);
-		
-		int number = 1;
-		ArrayList<Question> filteredRegQuestions = filterOutBadRegQuestions(regQuestions);
-		for(Question frq : filteredRegQuestions){
-			int numOfChoices = frq.choices.size();
-			String[] labels = new String[numOfChoices];
-			int[] positions = new int[numOfChoices];
-			String[] codes = new String[numOfChoices];
-			int position = positionsOfAllQuestions.get(frq.variable);
-			
-			initRowArrays(frq.choices, numOfChoices, position, labels, positions, codes);
-			String excelWorksheetTitle = getExcelWorksheetTitle(frq.label, frq.variable);
-			tables.add(new Table(number++, frq.label, excelWorksheetTitle, labels, positions, codes));
-		}
-		
-		
-		ArrayList<Question> filteredDemoQuestions = filterOutBadDemoQuestions(demoQuestions);
-		for(Question fdq : filteredDemoQuestions){
-			int numOfChoices = fdq.choices.size();
-			String[] labels = new String[numOfChoices];
-			int[] positions = new int[numOfChoices];
-			String[] codes = new String[numOfChoices];
-			int position = positionsOfAllQuestions.get(fdq.variable);
-
-			initRowArrays(fdq.choices, numOfChoices, position, labels, positions, codes);
-
-			
-			tables.add(new Table(number++, fdq.label, fdq.variable, labels, positions, codes));
-		}
+	static Table addTable(int number, String title, String excelWorksheetTitle, String[] labels, int[] positions, String[] codes){
+		Table t = new Table(number, title, excelWorksheetTitle, labels, positions, codes);
+		tables.add(t);
+		return t;
 	}
 	
-	private static Map<String, Integer> calcPositions(ArrayList<Question> regQuestions, ArrayList<Question> demoQuestions){
+	static Map<String, Integer> calcPositions(ArrayList<Question> regQuestions, ArrayList<Question> demoQuestions){
 		Map<String, Integer> positionsOfQuestions = new HashMap<>();
 		int pos = START_POS;
 		for(Question rq : regQuestions){
@@ -59,7 +32,7 @@ class EFileModel{
 	}
 	
 	//Also capitalizes the labels
-	private static void initRowArrays(ArrayList<String[]> choices, int len, int position, String[] labels, int[] positions, String[] codes){
+	static void initRowArrays(ArrayList<String[]> choices, int len, int position, String[] labels, int[] positions, String[] codes){
 		for(int i = 0; i < len; i++){
 			String rawLabel = choices.get(i)[1];
 			labels[i] = rawLabel.substring(0, 1).toUpperCase() + rawLabel.substring(1);
@@ -68,7 +41,7 @@ class EFileModel{
 		}
 	}
 	
-	private static ArrayList<Question> filterOutBadRegQuestions(ArrayList<Question> questions){
+	static ArrayList<Question> filterOutBadRegQuestions(ArrayList<Question> questions){
 		questions.removeIf(q -> q.label.isEmpty());								//filter questions with label
 		questions.removeIf(q -> q.choices.isEmpty());							//remove questions with no choices
 		questions.removeIf(q -> q.variable.charAt(0) == 'R');					//hopefully only removes recruit questions
@@ -83,7 +56,7 @@ class EFileModel{
 		return questions;
 	}
 	
-	private static ArrayList<Question> filterOutBadDemoQuestions(ArrayList<Question> questions){
+	static ArrayList<Question> filterOutBadDemoQuestions(ArrayList<Question> questions){
 		ArrayList<Question> r;
 		
 		r = questions.stream()
@@ -93,7 +66,7 @@ class EFileModel{
 		return r;
 	}
 	
-	private static String getExcelWorksheetTitle(String label, String variable){
+	static String getExcelWorksheetTitle(String label, String variable){
 		int delimiter = label.indexOf(".");		//find first period
 		
 		if(delimiter == -1 || delimiter > 9)	//if period not found or too far away then

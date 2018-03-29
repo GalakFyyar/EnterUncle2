@@ -112,6 +112,9 @@ class GUIContentPanel extends JPanel{
 			System.out.println(column);
 			System.out.println(row);
 			
+			
+			//QuestionnaireModel.updateQuestion();
+			//EFileModel.updateTable();
 		}
 	}
 }

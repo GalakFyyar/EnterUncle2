@@ -23,7 +23,7 @@ public class UncleConvert{
 			return;
 		}
 		
-		Controller.populateEFileModel();
+		Controller.populateEFileModelAndMaps();
 		Controller.write(file);
 		
 		System.out.println("END");

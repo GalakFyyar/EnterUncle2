@@ -110,7 +110,7 @@ class GUI2 extends JFrame{
 				if(ascFile != null){
 					boolean parseSuccess = Controller.parseASCFileAndPopulateQuestionnaireModel(ascFile);
 					if(parseSuccess){
-						Controller.populateEFileModel();
+						Controller.populateEFileModelAndMaps();
 						loadLowerMainPanelWithQuestions(lowerMainPanel);
 					}
 				}

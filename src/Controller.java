@@ -1,7 +1,12 @@
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 class Controller{
+	private static final Map<Question, Table> questionMap = new HashMap<>();			//Question -> Table
+	private static final Map<Table, Question> tableMap = new HashMap<>();				//Table -> Question
+	
 	static void throwErrorMessage(String err){
 		GUI2.throwErrorMessage(err);
 	}
@@ -41,10 +46,48 @@ class Controller{
 		QuestionnaireModel.addQuestion(variable, codeWidth, label, quePosition, shortLabel, ifDestination, elseDestination, skipCondition, choices);
 	}
 	
-	static void populateEFileModel(){
+	//Initializes EFileModel, questionMap and tableMap
+	static void populateEFileModelAndMaps(){
 		ArrayList<Question> regQuestions = QuestionnaireModel.getRegQuestions();
 		ArrayList<Question> demoQuestions = QuestionnaireModel.getDemoQuestions();
-		EFileModel.init(regQuestions, demoQuestions);
+		
+		Map<String, Integer> positionsOfAllQuestions = EFileModel.calcPositions(regQuestions, demoQuestions);
+		
+		int number = 1;
+		ArrayList<Question> filteredRegQuestions = EFileModel.filterOutBadRegQuestions(regQuestions);
+		for(Question frq : filteredRegQuestions){
+			int numOfChoices = frq.choices.size();
+			String[] labels = new String[numOfChoices];
+			int[] positions = new int[numOfChoices];
+			String[] codes = new String[numOfChoices];
+			int position = positionsOfAllQuestions.get(frq.variable);
+			
+			EFileModel.initRowArrays(frq.choices, numOfChoices, position, labels, positions, codes);
+			String excelWorksheetTitle = EFileModel.getExcelWorksheetTitle(frq.label, frq.variable);
+			Table t = EFileModel.addTable(number++, frq.label, excelWorksheetTitle, labels, positions, codes);
+			tableMap.put(t, frq);
+		}
+		
+		
+		ArrayList<Question> filteredDemoQuestions = EFileModel.filterOutBadDemoQuestions(demoQuestions);
+		for(Question fdq : filteredDemoQuestions){
+			int numOfChoices = fdq.choices.size();
+			String[] labels = new String[numOfChoices];
+			int[] positions = new int[numOfChoices];
+			String[] codes = new String[numOfChoices];
+			int position = positionsOfAllQuestions.get(fdq.variable);
+			
+			EFileModel.initRowArrays(fdq.choices, numOfChoices, position, labels, positions, codes);
+			
+			
+			Table t = EFileModel.addTable(number++, fdq.label, fdq.variable, labels, positions, codes);
+			tableMap.put(t, fdq);
+		}
+		
+		//adds all entries in tableMap to questionMap, effectively making a BiMap
+		for(Map.Entry<Table, Question> e : tableMap.entrySet()){
+			questionMap.put(e.getValue(), e.getKey());
+		}
 	}
 	
 	static void write(File ascFile){
