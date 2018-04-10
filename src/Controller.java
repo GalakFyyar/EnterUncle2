@@ -90,6 +90,10 @@ class Controller{
 		}
 	}
 	
+	static boolean tableExists(Question q){
+		return questionMap.containsKey(q);
+	}
+	
 	static void write(File ascFile){
 		Writer.writeFile(ascFile, EFileModel.getTables());
 	}

@@ -1,4 +1,18 @@
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JDesktopPane;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.UIManager;
+import javax.swing.WindowConstants;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -129,10 +143,9 @@ class GUI2 extends JFrame{
 		lowerMainPanel.setLayout(new BorderLayout());
 		
 		
-		//TODO -- add ImageIcon icon createImageIcon();
 		JPanel questionPanel = new JPanel();					//Goes on the left!
 		questionPanel.setLayout(new GridLayout(questions.size(), 1));
-		questions.forEach(q -> questionPanel.add(new QuestionPanelItem(q)));
+		questions.forEach(q -> questionPanel.add(new QuestionPanelItem(q, Controller.tableExists(q))));
 		JScrollPane leftScrollPane = new JScrollPane(questionPanel);
 		leftScrollPane.getVerticalScrollBar().setUnitIncrement(16);
 		leftScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -155,7 +168,7 @@ class GUI2 extends JFrame{
 		buttonlistener.enableButtons();
 	}
 	
-	static void swapSelectedItem(GUI2.PanelItem panelItem){
+	private static void swapSelectedItem(GUI2.PanelItem panelItem){
 		if(selectedItem != null)
 			selectedItem.unSelect();
 		selectedItem = panelItem;
@@ -169,8 +182,8 @@ class GUI2 extends JFrame{
 	private static class QuestionPanelItem extends PanelItem{
 		private Question question;
 		
-		QuestionPanelItem(Question q){
-			super(q.variable);
+		QuestionPanelItem(Question q, boolean mappedQuestion){
+			super(q.variable, true, mappedQuestion);
 			question = q;
 		}
 		
@@ -185,7 +198,7 @@ class GUI2 extends JFrame{
 		private Table table;
 		
 		TablePanelItem(Table t){
-			super("TABLE " + t.number + " - " + (t.title.length() < 20 ? t.title : t.title.substring(0, 20)));
+			super("TABLE " + t.number + " - " + (t.title.length() < 20 ? t.title : t.title.substring(0, 20)), false, false);
 			table = t;
 		}
 		
@@ -200,8 +213,10 @@ class GUI2 extends JFrame{
 		private final Border marginBorder = new EmptyBorder(0, 15, 0, 0);
 		private final CompoundBorder raisedButtonBorder;
 		private final CompoundBorder loweredButtonBorder;
+		private final ImageIcon greenIcon	= new ImageIcon("green17.png");
+		private final ImageIcon redIcon		= new ImageIcon("red17.png");
 		
-		PanelItem(String item){
+		PanelItem(String item, boolean showIcon, boolean isMapped){
 			super(new BorderLayout());
 			raisedButtonBorder = new CompoundBorder(BorderFactory.createRaisedBevelBorder(), marginBorder);
 			loweredButtonBorder = new CompoundBorder(BorderFactory.createLoweredBevelBorder(), marginBorder);
@@ -209,7 +224,14 @@ class GUI2 extends JFrame{
 			setBorder(raisedButtonBorder);
 			setPreferredSize(new Dimension(150, 30));
 			setBackground(Color.LIGHT_GRAY);
-			add(new JLabel(item));
+			
+			if(showIcon){
+				if(isMapped)
+					add(new JLabel(item, greenIcon, JLabel.LEFT));
+				else
+					add(new JLabel(item, redIcon, JLabel.LEFT));
+			}else
+				add(new JLabel(item));
 			
 			addMouseListener(this);
 		}
@@ -251,7 +273,7 @@ class GUI2 extends JFrame{
 		JMenuItem export;
 		JMenuItem exit;
 		
-		 MenuListener(JMenuItem open, JMenuItem save, JMenuItem export, JMenuItem exit){
+		MenuListener(JMenuItem open, JMenuItem save, JMenuItem export, JMenuItem exit){
 			super();
 			
 			open.addActionListener(this);
