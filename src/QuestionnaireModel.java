@@ -162,4 +162,9 @@ class QuestionnaireModel{
 			System.out.println(c[0] + "|--|" + c[1]);
 		System.out.println();
 	}
+	
+	static void changeCode(Question q, int choice, String change){
+		//q.choices.get(choice)[choice] = change;
+		q.changeCode(choice, change);
+	}
 }

@@ -25,4 +25,10 @@ class Question{
 		this.elseDestination = elseDestination;
 		this.choices = choices;
 	}
+	
+	void changeCode(int choice, String change){
+		String[] oldChoice = choices.get(choice);
+		String[] newChoice = {change, oldChoice[1], oldChoice[2]};
+		choices.set(choice, newChoice);
+	}
 }

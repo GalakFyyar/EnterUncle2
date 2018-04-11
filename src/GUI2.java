@@ -43,7 +43,7 @@ class GUI2 extends JFrame{
 	
 	private static ButtonListener buttonlistener;
 	private static PanelItem selectedItem;
-	private static final GUIContentPanel contentPanel = new GUIContentPanel();
+	private static final GUIContentPanel CONTENT_PANEL = new GUIContentPanel();
 	
 	GUI2(){
 		singleton = this;
@@ -126,6 +126,8 @@ class GUI2 extends JFrame{
 					if(parseSuccess){
 						Controller.populateEFileModelAndMaps();
 						loadLowerMainPanelWithQuestions(lowerMainPanel);
+						
+						buttonlistener.enableButtons();
 					}
 				}
 			}
@@ -160,12 +162,10 @@ class GUI2 extends JFrame{
 		
 		lowerMainPanel.add(leftScrollPane, BorderLayout.WEST);
 		lowerMainPanel.add(rightScrollPane, BorderLayout.EAST);
-		lowerMainPanel.add(contentPanel, BorderLayout.CENTER);
+		lowerMainPanel.add(CONTENT_PANEL, BorderLayout.CENTER);
 		
 		lowerMainPanel.revalidate();
 		lowerMainPanel.repaint();
-		
-		buttonlistener.enableButtons();
 	}
 	
 	private static void swapSelectedItem(GUI2.PanelItem panelItem){

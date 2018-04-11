@@ -2,40 +2,42 @@ import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 import java.awt.*;
 
 class GUIContentPanel extends JPanel{
 	private static GUIContentPanel singleton;
-	private static final CardLayout layout = new CardLayout();
-	private static final QuestionPanel questionPanel = new QuestionPanel();
-	private static final TablePanel tablePanel = new TablePanel();
+	private static final CardLayout LAYOUT = new CardLayout();
+	private static final QuestionContentPanel QUESTION_CONTENT_PANEL = new QuestionContentPanel();
+	private static final TableContentPanel TABLE_CONTENT_PANEL = new TableContentPanel();
 	private static final String QUESTION_CARD = "Question";
 	private static final String TABLE_CARD = "Table";
 	
 	GUIContentPanel(){
-		super(layout);
+		super(LAYOUT);
 		add(new JPanel(), "Blank");         //Default card, appears only at beginning when neither question nor table has been selected
-		add(questionPanel, QUESTION_CARD);
-		add(tablePanel, TABLE_CARD);
+		add(QUESTION_CONTENT_PANEL, QUESTION_CARD);
+		add(TABLE_CONTENT_PANEL, TABLE_CARD);
 		singleton = this;
 	}
 	
 	static void loadContentPanelForQuestion(Question q){
-		questionPanel.loadContent(q);
-		layout.show(singleton, QUESTION_CARD);
+		QUESTION_CONTENT_PANEL.loadContent(q);
+		LAYOUT.show(singleton, QUESTION_CARD);
 	}
 	
 	static void loadContentPanelForTable(Table t){
-		tablePanel.loadContent(t);
-		layout.show(singleton, TABLE_CARD);
+		TABLE_CONTENT_PANEL.loadContent(t);
+		LAYOUT.show(singleton, TABLE_CARD);
 	}
 	
-	static class QuestionPanel extends JPanel implements TableModelListener{
+	static class QuestionContentPanel extends JPanel implements TableModelListener{
 		private final JTextField labelField;
 		private final JTable choicesTable;
 		private final String[] titles = new String[]{"Code", "Label", "Destination"};
+		private Question question;
 		
-		QuestionPanel(){
+		QuestionContentPanel(){
 			super(new BorderLayout());
 			labelField = new JTextField();
 			labelField.setMinimumSize(new Dimension(0, 200));
@@ -52,6 +54,7 @@ class GUIContentPanel extends JPanel{
 		}
 		
 		void loadContent(Question q){
+			question = q;
 			labelField.setText(q.label);
 			int len = q.choices.size();
 			String[][] choices = new String[len][];
@@ -64,18 +67,44 @@ class GUIContentPanel extends JPanel{
 		}
 		
 		@Override
+		//JTable created or data changed
 		public void tableChanged(TableModelEvent e){
-			//Data changed
-			//System.out.println(e.toString());
+			int column = e.getColumn();
+			int row = e.getFirstRow();
+			
+			//When a JTable gets created, the changed column is -1 since no change was actually made.
+			//This means that we can just exist the method.
+			if(column == -1){
+				return;
+			}
+			
+			TableModel model = choicesTable.getModel();
+			String change = (String)model.getValueAt(row, column);
+			
+			switch(column){
+				case 0:					//code changed
+					Controller.QuestionCodeChange(question, row, change);
+					break;
+				case 1:					//Label Changed
+					//doSomething;
+					break;
+				case 2:					//Skip Destination changed
+					//doSomething;
+			}
+			
+			System.out.println(column);
+			System.out.println(row);
+			
+			
 		}
 	}
 	
-	static class TablePanel extends JPanel implements TableModelListener{
+	static class TableContentPanel extends JPanel implements TableModelListener{
 		private final JTextField titleField;
 		private final JTable rowsAndColumnsTable;
 		private final String[] titles = new String[]{"Label", "Position", "Extras"};
 		
-		TablePanel(){
+		TableContentPanel(){
 			super(new BorderLayout());
 			titleField = new JTextField();
 			titleField.setMinimumSize(new Dimension(0, 200));
@@ -105,8 +134,10 @@ class GUIContentPanel extends JPanel{
 			int column = e.getColumn();
 			int row = e.getFirstRow();
 			
+			//When a JTable gets created, the changed column is -1 since no change was actually made.
+			//This means that we can just exist the method.
 			if(column == -1){
-				System.out.println("?");
+				return;
 			}
 			
 			System.out.println(column);

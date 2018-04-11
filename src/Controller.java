@@ -94,6 +94,10 @@ class Controller{
 		return questionMap.containsKey(q);
 	}
 	
+	static void QuestionCodeChange(Question q, int choice, String change){
+		QuestionnaireModel.changeCode(q, choice, change);
+	}
+	
 	static void write(File ascFile){
 		Writer.writeFile(ascFile, EFileModel.getTables());
 	}
