@@ -26,9 +26,23 @@ class Question{
 		this.choices = choices;
 	}
 	
-	void changeCode(int choice, String change){
+	//These three changeChoice methods maybe able to be reduced to one.
+	//If one takes the columnNumber int and just propagate it all the way to here, instead of having three different paths to take.
+	void changeChoiceCode(int choice, String newCode){
 		String[] oldChoice = choices.get(choice);
-		String[] newChoice = {change, oldChoice[1], oldChoice[2]};
+		String[] newChoice = {newCode, oldChoice[1], oldChoice[2]};
+		choices.set(choice, newChoice);
+	}
+	
+	void changeChoiceLabel(int choice, String newLabel){
+		String[] oldChoice = choices.get(choice);
+		String[] newChoice = {oldChoice[0], newLabel, oldChoice[2]};
+		choices.set(choice, newChoice);
+	}
+	
+	void changeChoiceSxipDestination(int choice, String newSkip){
+		String[] oldChoice = choices.get(choice);
+		String[] newChoice = {oldChoice[0], oldChoice[1], newSkip};
 		choices.set(choice, newChoice);
 	}
 }

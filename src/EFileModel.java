@@ -77,4 +77,16 @@ class EFileModel{
 		}else
 			return "Q" + label.substring(0, delimiter).toUpperCase();
 	}
+	
+	static void changeRowLabel(Table t, int row, String newLabel){
+		t.changeRowLabel(row, newLabel);
+	}
+	
+	static void changeRowPosition(Table t, int row, String newPosition){
+		t.changeRowPosition(row, newPosition);
+	}
+	
+	static void changeRowExtras(Table t, int row, String newExtras){
+		t.changeRowExtras(row, newExtras);
+	}
 }

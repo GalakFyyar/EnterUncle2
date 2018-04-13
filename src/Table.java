@@ -68,4 +68,16 @@ class Table{
 			ret.add(base);
 		return ret;
 	}
+	
+	void changeRowLabel(int row, String newLabel){
+		rows[row][0] = newLabel;
+	}
+	
+	void changeRowPosition(int row, String newPosition){
+		rows[row][1] = newPosition;
+	}
+	
+	void changeRowExtras(int row, String newExtras){
+		rows[row][2] = newExtras;
+	}
 }

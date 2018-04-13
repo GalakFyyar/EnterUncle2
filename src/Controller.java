@@ -94,8 +94,30 @@ class Controller{
 		return questionMap.containsKey(q);
 	}
 	
-	static void QuestionCodeChange(Question q, int choice, String change){
-		QuestionnaireModel.changeCode(q, choice, change);
+	static void dataQuestionChange(Question q, GUIContentPanel.QuestionContentPanel.Column column, int choice, String change){
+		switch(column){
+			case CODE:
+				QuestionnaireModel.changeCodeOfQuestion(q, choice, change);
+				break;
+			case LABEL:
+				QuestionnaireModel.changeLabelOfQuestion(q, choice, change);
+				break;
+			case SKIP_DESTINATION:
+				QuestionnaireModel.changeSkipDestinationOfQuestion(q, choice, change);
+		}
+	}
+	
+	static void dataTableChange(Table table, GUIContentPanel.TableContentPanel.Column column, int row, String change){
+		switch(column){
+			case LABEL:
+				EFileModel.changeRowLabel(table, row, change);
+				break;
+			case POSITION:
+				EFileModel.changeRowPosition(table, row, change);
+				break;
+			case EXTRAS:
+				EFileModel.changeRowExtras(table, row, change);
+		}
 	}
 	
 	static void write(File ascFile){

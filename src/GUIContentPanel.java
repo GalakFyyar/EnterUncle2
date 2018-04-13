@@ -4,6 +4,9 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Supplier;
 
 class GUIContentPanel extends JPanel{
 	private static GUIContentPanel singleton;
@@ -34,7 +37,7 @@ class GUIContentPanel extends JPanel{
 	static class QuestionContentPanel extends JPanel implements TableModelListener{
 		private final JTextField labelField;
 		private final JTable choicesTable;
-		private final String[] titles = new String[]{"Code", "Label", "Destination"};
+		private final String[] titles = new String[]{Column.CODE.title(), Column.LABEL.title(), Column.SKIP_DESTINATION.title()};
 		private Question question;
 		
 		QuestionContentPanel(){
@@ -82,27 +85,42 @@ class GUIContentPanel extends JPanel{
 			String change = (String)model.getValueAt(row, column);
 			
 			switch(column){
-				case 0:					//code changed
-					Controller.QuestionCodeChange(question, row, change);
+				case 0:					//Code changed
+					Controller.dataQuestionChange(question, Column.CODE, row, change);
 					break;
 				case 1:					//Label Changed
-					//doSomething;
+					Controller.dataQuestionChange(question, Column.LABEL, row, change);
 					break;
 				case 2:					//Skip Destination changed
-					//doSomething;
+					Controller.dataQuestionChange(question, Column.SKIP_DESTINATION, row, change);
 			}
 			
 			System.out.println(column);
 			System.out.println(row);
+		}
+		
+		public enum Column{
+			CODE("Code"),
+			LABEL("Label"),
+			SKIP_DESTINATION("Skip to");
 			
+			private String title;
 			
+			Column(String s){
+				title = s;
+			}
+			
+			public String title(){
+				return title;
+			}
 		}
 	}
 	
 	static class TableContentPanel extends JPanel implements TableModelListener{
 		private final JTextField titleField;
 		private final JTable rowsAndColumnsTable;
-		private final String[] titles = new String[]{"Label", "Position", "Extras"};
+		private final String[] titles = new String[]{Column.LABEL.title(), Column.POSITION.title(), Column.EXTRAS.title()};
+		private Table table;
 		
 		TableContentPanel(){
 			super(new BorderLayout());
@@ -126,6 +144,7 @@ class GUIContentPanel extends JPanel{
 			DefaultTableModel tm = (DefaultTableModel) rowsAndColumnsTable.getModel();
 			tm.getDataVector().removeAllElements();
 			tm.setDataVector(t.rows, titles);
+			table = t;
 		}
 		
 		@Override
@@ -140,12 +159,38 @@ class GUIContentPanel extends JPanel{
 				return;
 			}
 			
+			TableModel model = rowsAndColumnsTable.getModel();
+			String change = (String)model.getValueAt(row, column);
+			
+			switch(column){
+				case 0:					//Label changed
+					Controller.dataTableChange(table, Column.LABEL, row, change);
+					break;
+				case 1:					//Position Changed
+					Controller.dataTableChange(table, Column.POSITION, row, change);
+					break;
+				case 2:					//Skip Destination changed
+					Controller.dataTableChange(table, Column.EXTRAS, row, change);
+			}
+			
 			System.out.println(column);
 			System.out.println(row);
+		}
+		
+		public enum Column{
+			LABEL("Label"),
+			POSITION("Position"),
+			EXTRAS("Extras");
 			
+			private String title;
 			
-			//QuestionnaireModel.updateQuestion();
-			//EFileModel.updateTable();
+			Column(String s){
+				title = s;
+			}
+			
+			public String title(){
+				return title;
+			}
 		}
 	}
 }

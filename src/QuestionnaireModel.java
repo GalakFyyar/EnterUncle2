@@ -143,28 +143,15 @@ class QuestionnaireModel{
 		return position;
 	}
 	
-	@SuppressWarnings("unused")
-	static void printAll(){
-		for(Question q : questions){
-			printQuestion(q);
-		}
+	static void changeCodeOfQuestion(Question q, int choice, String newCode){
+		q.changeChoiceCode(choice, newCode);
 	}
 	
-	@SuppressWarnings({"unused", "WeakerAccess"})
-	static void printQuestion(Question q){
-		System.out.println(q.variable);
-		if(!q.label.isEmpty())
-			System.out.println(q.label);
-		else
-			System.out.println("EMPTY LABEL");
-		System.out.println(q.identifier);
-		for(String[] c : q.choices)
-			System.out.println(c[0] + "|--|" + c[1]);
-		System.out.println();
+	static void changeLabelOfQuestion(Question q, int choice, String newLabel){
+		q.changeChoiceLabel(choice, newLabel);
 	}
 	
-	static void changeCode(Question q, int choice, String change){
-		//q.choices.get(choice)[choice] = change;
-		q.changeCode(choice, change);
+	static void changeSkipDestinationOfQuestion(Question q, int choice, String newSkip){
+		q.changeChoiceSxipDestination(choice, newSkip);
 	}
 }
