@@ -42,8 +42,8 @@ class Controller{
 		return EFileModel.getTables();
 	}
 	
-	static void addQuestion(String variable, int codeWidth, String label, int quePosition, String shortLabel, String ifDestination, String elseDestination, String skipCondition, ArrayList<String[]> choices){
-		QuestionnaireModel.addQuestion(variable, codeWidth, label, quePosition, shortLabel, ifDestination, elseDestination, skipCondition, choices);
+	static void addQuestion(String variable, int codeWidth, String label, int quePosition, String shortLabel, String skipCondition, String ifDestination, String elseDestination, ArrayList<String[]> choices){
+		QuestionnaireModel.addQuestion(variable, codeWidth, label, quePosition, shortLabel, skipCondition, ifDestination, elseDestination, choices);
 	}
 	
 	//Initializes EFileModel, questionMap and tableMap

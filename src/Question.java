@@ -8,22 +8,29 @@ class Question{
 	int quePosition;	//Position in ASC file, maybe unnecessary, if no questions are removed, then this value will be the same as this object's index in the question list
 	String shortLabel;
 	String skipCondition;
-	String ifDestination = "";
-	String elseDestination = "";
+	String ifDestination;
+	String elseDestination;
 	int ifSkip;
 	int elseSkip;
-	ArrayList<String[]> choices = new ArrayList<>();//[0]=code; [1]=label; [2]=skipDestination
+	ArrayList<String[]> choices;//[0]=code; [1]=label; [2]=skipDestination
 	
-	Question(String variable, int codeWidth, String label, int quePosition, String shortLabel, String ifDestination, String elseDestination, String skipCondition, ArrayList<String[]> choices){
+	Question(String variable, int codeWidth, String label, String identifier, int quePosition, String shortLabel, String skipCondition, String ifDestination, String elseDestination, int ifSkip, int elseSkip, ArrayList<String[]> choices){
 		this.variable = variable;
 		this.codeWidth = codeWidth;
 		this.label = label;
+		this.identifier = identifier;
 		this.quePosition = quePosition;
 		this.shortLabel = shortLabel;
 		this.skipCondition = skipCondition;
 		this.ifDestination = ifDestination;
 		this.elseDestination = elseDestination;
+		this.ifSkip = ifSkip;
+		this.elseSkip = elseSkip;
 		this.choices = choices;
+	}
+	
+	Question(String variable, int codeWidth, String label, int quePosition, String shortLabel, String skipCondition, String ifDestination, String elseDestination, ArrayList<String[]> choices){
+		this(variable, codeWidth, label, "", quePosition, shortLabel, skipCondition, ifDestination, elseDestination, 0, 0, choices);
 	}
 	
 	//These three changeChoice methods maybe able to be reduced to one.
@@ -40,7 +47,7 @@ class Question{
 		choices.set(choice, newChoice);
 	}
 	
-	void changeChoiceSxipDestination(int choice, String newSkip){
+	void changeChoiceSkipDestination(int choice, String newSkip){
 		String[] oldChoice = choices.get(choice);
 		String[] newChoice = {oldChoice[0], oldChoice[1], newSkip};
 		choices.set(choice, newChoice);

@@ -95,7 +95,7 @@ class Parser{
 				return false;
 			}
 			
-			Controller.addQuestion(variable, codeWidth, label, quePosition, shortLabel, ifDestination, elseDestination, skipCondition, choices);
+			Controller.addQuestion(variable, codeWidth, label, quePosition, shortLabel, skipCondition, ifDestination, elseDestination, choices);
 			quePosition++;
 		}
 		

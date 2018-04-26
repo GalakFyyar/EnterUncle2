@@ -35,8 +35,8 @@ class QuestionnaireModel{
 		return questions.isEmpty();
 	}
 	
-	static void addQuestion(String variable, int codeWidth, String label, int quePosition, String shortLabel, String ifDestination, String elseDestination, String skipCondition, ArrayList<String[]> choices){
-		Question q = new Question(variable, codeWidth, label, quePosition, shortLabel, ifDestination, elseDestination, skipCondition, choices);
+	static void addQuestion(String variable, int codeWidth, String label, int quePosition, String shortLabel, String skipCondition, String ifDestination, String elseDestination, ArrayList<String[]> choices){
+		Question q = new Question(variable, codeWidth, label, quePosition, shortLabel, skipCondition, ifDestination, elseDestination, choices);
 		questions.add(q);
 		questionNameMap.put(variable, q);
 	}
@@ -152,6 +152,6 @@ class QuestionnaireModel{
 	}
 	
 	static void changeSkipDestinationOfQuestion(Question q, int choice, String newSkip){
-		q.changeChoiceSxipDestination(choice, newSkip);
+		q.changeChoiceSkipDestination(choice, newSkip);
 	}
 }
