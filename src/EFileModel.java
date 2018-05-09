@@ -89,4 +89,10 @@ class EFileModel{
 	static void changeRowExtras(Table t, int row, String newExtras){
 		t.changeRowExtras(row, newExtras);
 	}
+	
+	//Adds all the special bells and whistles for IVRs
+	static void formatAsIVR(){
+		Table t = Controller.getTableFromQuestionIdentifier("AGE");
+		System.out.println(t.title);
+	}
 }

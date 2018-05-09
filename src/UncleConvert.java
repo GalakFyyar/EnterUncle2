@@ -3,8 +3,11 @@ import java.io.File;
 public class UncleConvert{
 	public static void main(String[] args) {
 		System.out.println("START");
-		//test();
-		launchGUI();
+		if(args.length > 0 && args[0].equals("-t")){
+			test();
+		}else{
+			launchGUI();
+		}
 	}
 
 	private static void launchGUI(){
@@ -12,7 +15,7 @@ public class UncleConvert{
 	}
 
 	private static void test(){
-		String filePath = "G:\\FORUM\\FOLD\\FOLD.ASC";
+		String filePath = "G:\\FORUM\\FOLD\\FOLD - COPY.ASC";
 		//String filePath = "E:\\MAN_SON\\Projects\\IdeaProjects\\EnterUncle2\\FOMB.ASC";
 		
 		File file = new File(filePath);
@@ -23,7 +26,7 @@ public class UncleConvert{
 			return;
 		}
 		
-		Controller.populateEFileModelAndMaps();
+		Controller.populateEFile();
 		Controller.write(file);
 		
 		System.out.println("END");

@@ -26,14 +26,6 @@ class Controller{
 		return parseSuccess && finalizeSuccess;
 	}
 	
-	static ArrayList<Question> getRegQuestions(){
-		return QuestionnaireModel.getRegQuestions();
-	}
-	
-	static ArrayList<Question> getDemoQuestions(){
-		return QuestionnaireModel.getDemoQuestions();
-	}
-	
 	static ArrayList<Question> getAllQuestions() {
 		return QuestionnaireModel.getAllQuestions();
 	}
@@ -47,7 +39,7 @@ class Controller{
 	}
 	
 	//Initializes EFileModel, questionMap and tableMap
-	static void populateEFileModelAndMaps(){
+	static void populateEFile(){
 		ArrayList<Question> regQuestions = QuestionnaireModel.getRegQuestions();
 		ArrayList<Question> demoQuestions = QuestionnaireModel.getDemoQuestions();
 		
@@ -88,6 +80,8 @@ class Controller{
 		for(Map.Entry<Table, Question> e : tableMap.entrySet()){
 			questionMap.put(e.getValue(), e.getKey());
 		}
+		
+		EFileModel.formatAsIVR();
 	}
 	
 	static boolean tableExists(Question q){
@@ -118,6 +112,11 @@ class Controller{
 			case EXTRAS:
 				EFileModel.changeRowExtras(table, row, change);
 		}
+	}
+	
+	static Table getTableFromQuestionIdentifier(String identifier){
+		Question q = QuestionnaireModel.getDemoQuestionFromIdentifier(identifier);
+		return questionMap.get(q);
 	}
 	
 	static void write(File ascFile){

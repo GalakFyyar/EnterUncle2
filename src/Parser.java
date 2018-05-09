@@ -113,8 +113,12 @@ class Parser{
 	}
 	
 	private static String parseLabel(String rawLabel){
-		//Replace tabs and remove square brackets around label
-		return rawLabel.replace('\t', ' ').substring(1, rawLabel.length() - 1).trim();
+		//Remove leading and trailing square brackets,
+		//then remove leading and trailing spaces,
+		//then replace tabs with a space,
+		//reduce consecutive spaces to one space
+		//replace weird unicode apostrophe to ASCII apostrophe
+		return rawLabel.substring(1, rawLabel.length() - 1).trim().replace('\t', ' ').replaceAll(" +", " ").replace("\u00B4", "'");
 	}
 	
 	private static String parseShortLabel(String rawShortLabel){
@@ -140,7 +144,7 @@ class Parser{
 	
 	private static String[] parseChoice(String rawChoice, int codeWidth){
 		int choiceLabelEndPos = rawChoice.indexOf(']');
-		String choiceLabel = rawChoice.substring(1, choiceLabelEndPos);
+		String choiceLabel = rawChoice.substring(1, choiceLabelEndPos).replace("\u2019", "'");	//remove surrounding brackets and fix apostrophe
 		
 		int codeStartPos = rawChoice.indexOf('[', choiceLabelEndPos) + 1;
 		String code = rawChoice.substring(codeStartPos, codeStartPos + codeWidth);

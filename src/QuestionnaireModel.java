@@ -6,8 +6,27 @@ class QuestionnaireModel{
 	private static final ArrayList<Question> questions = new ArrayList<>();
 	private static final ArrayList<Question> regQuestions = new ArrayList<>();
 	private static final ArrayList<Question> demoQuestions = new ArrayList<>();
-	private static final Map<String, Question> questionNameMap = new HashMap<>();		//Variable -> Question
+	private static final Map<String, String> demoVariableToIdentifier = new HashMap<>();		//Variable		-> Identifier
+	private static final Map<String, Question> identifierToDemoQuestion = new HashMap<>();		//Identifier	-> Question
 	private static String location = "";
+	
+	static{
+		demoVariableToIdentifier.put("D0", "COMMUNITY"			);
+		demoVariableToIdentifier.put("D1", "GENDER"				);
+		demoVariableToIdentifier.put("D2", "AGE"				);
+		demoVariableToIdentifier.put("D3", "INCOME"				);
+		demoVariableToIdentifier.put("D4", "EDU"				);
+		demoVariableToIdentifier.put("D5", "PROPERTY"			);
+		demoVariableToIdentifier.put("D6", "TRANSIT"			);
+		demoVariableToIdentifier.put("D7", "RELIGION"			);
+		demoVariableToIdentifier.put("D8", "ETHNIC"				);
+		demoVariableToIdentifier.put("D9", "CHILDREN"			);
+		demoVariableToIdentifier.put("D10", "REACHED"			);
+		demoVariableToIdentifier.put("D11", "ALSO LANDLINE"		);
+		demoVariableToIdentifier.put("D14", "PROVINCE"			);
+		demoVariableToIdentifier.put("D16", "CANADA BORN"		);
+		demoVariableToIdentifier.put("D18", "HOME"				);
+	}
 	
 	public static String getLocation(){
 		return location;
@@ -38,7 +57,6 @@ class QuestionnaireModel{
 	static void addQuestion(String variable, int codeWidth, String label, int quePosition, String shortLabel, String skipCondition, String ifDestination, String elseDestination, ArrayList<String[]> choices){
 		Question q = new Question(variable, codeWidth, label, quePosition, shortLabel, skipCondition, ifDestination, elseDestination, choices);
 		questions.add(q);
-		questionNameMap.put(variable, q);
 	}
 	//returns true for success, false otherwise
 	
@@ -97,8 +115,8 @@ class QuestionnaireModel{
 		}
 		
 		//Determine the identifier of regular questions
-		for(Question q : regQuestions){
-			String label = q.label;
+		for(Question rq : regQuestions){
+			String label = rq.label;
 			if(!label.isEmpty()){
 				int delimiter = label.indexOf(".");		//find first period
 				
@@ -106,9 +124,18 @@ class QuestionnaireModel{
 					delimiter = label.indexOf(" ");		//use first space instead
 				
 				if(delimiter == -1){					//space not found either
-					q.identifier = q.variable;
+					rq.identifier = rq.variable;
 				}else
-					q.identifier = label.substring(0, delimiter).toUpperCase();
+					rq.identifier = label.substring(0, delimiter).toUpperCase();
+			}
+		}
+		
+		for(Question dq : demoQuestions){
+			if(demoVariableToIdentifier.containsKey(dq.variable)){
+				dq.identifier = demoVariableToIdentifier.get(dq.variable);
+				identifierToDemoQuestion.put(dq.identifier, dq);
+			}else{
+				dq.identifier = dq.variable;
 			}
 		}
 		
@@ -153,5 +180,9 @@ class QuestionnaireModel{
 	
 	static void changeSkipDestinationOfQuestion(Question q, int choice, String newSkip){
 		q.changeChoiceSkipDestination(choice, newSkip);
+	}
+	
+	static Question getDemoQuestionFromIdentifier(String identifier){
+		return identifierToDemoQuestion.get(identifier);
 	}
 }
