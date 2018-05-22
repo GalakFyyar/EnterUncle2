@@ -1,3 +1,5 @@
+import com.google.common.collect.ImmutableMap;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -6,26 +8,28 @@ class QuestionnaireModel{
 	private static final ArrayList<Question> questions = new ArrayList<>();
 	private static final ArrayList<Question> regQuestions = new ArrayList<>();
 	private static final ArrayList<Question> demoQuestions = new ArrayList<>();
-	private static final Map<String, String> demoVariableToIdentifier = new HashMap<>();		//Variable		-> Identifier
+	private static final ImmutableMap<String, String> demoVariableToIdentifier;							//Variable		-> Identifier
 	private static final Map<String, Question> identifierToDemoQuestion = new HashMap<>();		//Identifier	-> Question
 	private static String location = "";
 	
 	static{
-		demoVariableToIdentifier.put("D0", "COMMUNITY"			);
-		demoVariableToIdentifier.put("D1", "GENDER"				);
-		demoVariableToIdentifier.put("D2", "AGE"				);
-		demoVariableToIdentifier.put("D3", "INCOME"				);
-		demoVariableToIdentifier.put("D4", "EDU"				);
-		demoVariableToIdentifier.put("D5", "PROPERTY"			);
-		demoVariableToIdentifier.put("D6", "TRANSIT"			);
-		demoVariableToIdentifier.put("D7", "RELIGION"			);
-		demoVariableToIdentifier.put("D8", "ETHNIC"				);
-		demoVariableToIdentifier.put("D9", "CHILDREN"			);
-		demoVariableToIdentifier.put("D10", "REACHED"			);
-		demoVariableToIdentifier.put("D11", "ALSO LANDLINE"		);
-		demoVariableToIdentifier.put("D14", "PROVINCE"			);
-		demoVariableToIdentifier.put("D16", "CANADA BORN"		);
-		demoVariableToIdentifier.put("D18", "HOME"				);
+		demoVariableToIdentifier = ImmutableMap.<String, String>builder()
+		.put("D0", "COMMUNITY")
+		.put("D1", "GENDER")
+		.put("D2", "AGE")
+		.put("D3", "INCOME")
+		.put("D4", "EDU")
+		.put("D5", "PROPERTY")
+		.put("D6", "TRANSIT")
+		.put("D7", "RELIGION")
+		.put("D8", "ETHNIC")
+		.put("D9", "CHILDREN")
+		.put("D10", "REACHED")
+		.put("D11", "ALSO LANDLINE")
+		.put("D14", "PROVINCE")
+		.put("D16", "CANADA BORN")
+		.put("D18", "HOME")
+		.build();
 	}
 	
 	public static String getLocation(){
