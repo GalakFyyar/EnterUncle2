@@ -1,11 +1,14 @@
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 class Controller{
-	private static final Map<Question, Table> questionMap = new HashMap<>();			//Question -> Table
-	private static final Map<Table, Question> tableMap = new HashMap<>();				//Table -> Question
+	private static final BiMap<Question, Table> questionAndTableBiMap = HashBiMap.create();
+	private static final Set<String> unwantedVariables = new HashSet<>(Arrays.asList("TZONE", "LOC", "LDF", "LDE", "AREA", "FSA", "FSA1", "LANG", "IT2", "S1", "S2", "S3", "INT01", "INT02", "INT99", "C3", "INT"));//todo: make extendable
 	
 	static void throwErrorMessage(String err){
 		GUI2.throwErrorMessage(err);
@@ -43,49 +46,15 @@ class Controller{
 		ArrayList<Question> regQuestions = QuestionnaireModel.getRegQuestions();
 		ArrayList<Question> demoQuestions = QuestionnaireModel.getDemoQuestions();
 		
-		Map<String, Integer> positionsOfAllQuestions = EFileModel.calcPositions(regQuestions, demoQuestions);
+		Map<String, Integer> positionsOfAllQuestions = calcPositions(regQuestions, demoQuestions);
 		
-		int number = 1;
-		ArrayList<Question> filteredRegQuestions = EFileModel.filterOutBadRegQuestions(regQuestions);
-		for(Question frq : filteredRegQuestions){
-			int numOfChoices = frq.choices.size();
-			String[] labels = new String[numOfChoices];
-			int[] positions = new int[numOfChoices];
-			String[] codes = new String[numOfChoices];
-			int position = positionsOfAllQuestions.get(frq.variable);
-			
-			EFileModel.initRowArrays(frq.choices, numOfChoices, position, labels, positions, codes);
-			String excelWorksheetTitle = EFileModel.getExcelWorksheetTitle(frq.label, frq.variable);
-			Table t = EFileModel.addTable(number++, frq.label, excelWorksheetTitle, labels, positions, codes);
-			tableMap.put(t, frq);
-		}
-		
-		
-		ArrayList<Question> filteredDemoQuestions = EFileModel.filterOutBadDemoQuestions(demoQuestions);
-		for(Question fdq : filteredDemoQuestions){
-			int numOfChoices = fdq.choices.size();
-			String[] labels = new String[numOfChoices];
-			int[] positions = new int[numOfChoices];
-			String[] codes = new String[numOfChoices];
-			int position = positionsOfAllQuestions.get(fdq.variable);
-			
-			EFileModel.initRowArrays(fdq.choices, numOfChoices, position, labels, positions, codes);
-			
-			
-			Table t = EFileModel.addTable(number++, fdq.label, fdq.variable, labels, positions, codes);
-			tableMap.put(t, fdq);
-		}
-		
-		//adds all entries in tableMap to questionMap, effectively making a BiMap
-		for(Map.Entry<Table, Question> e : tableMap.entrySet()){
-			questionMap.put(e.getValue(), e.getKey());
-		}
+		initializeEFileModel(regQuestions, demoQuestions, positionsOfAllQuestions);
 		
 		EFileModel.formatAsIVR();
 	}
 	
 	static boolean tableExists(Question q){
-		return questionMap.containsKey(q);
+		return questionAndTableBiMap.containsKey(q);
 	}
 	
 	static void dataQuestionChange(Question q, GUIContentPanel.QuestionContentPanel.Column column, int choice, String change){
@@ -116,10 +85,85 @@ class Controller{
 	
 	static Table getTableFromQuestionIdentifier(String identifier){
 		Question q = QuestionnaireModel.getDemoQuestionFromIdentifier(identifier);
-		return questionMap.get(q);
+		return questionAndTableBiMap.get(q);
 	}
 	
 	static void write(File ascFile){
 		Writer.writeFile(ascFile, EFileModel.getTables());
+	}
+	
+	private static Map<String, Integer> calcPositions(ArrayList<Question> regQuestions, ArrayList<Question> demoQuestions){
+		Map<String, Integer> positionsOfQuestions = new HashMap<>();
+		int pos = EFileModel.START_POS;
+		for(Question rq : regQuestions){
+			positionsOfQuestions.put(rq.variable, pos);
+			pos += rq.codeWidth;
+		}
+		for(Question dq : demoQuestions){
+			positionsOfQuestions.put(dq.variable, pos);
+			pos += dq.codeWidth;
+		}
+		return positionsOfQuestions;
+	}
+	
+	private static ArrayList<Question> filterOutBadRegQuestions(ArrayList<Question> questions){
+		questions.removeIf(q -> q.label.isEmpty());								//filter questions with label
+		questions.removeIf(q -> q.choices.isEmpty());							//remove questions with no choices
+		questions.removeIf(q -> q.variable.charAt(0) == 'R');					//hopefully only removes recruit questions
+		questions.removeIf(q -> unwantedVariables.contains(q.variable));		//remove unwanted variables
+		
+		return questions;
+	}
+	
+	private static ArrayList<Question> filterOutBadDemoQuestions(ArrayList<Question> questions){
+		ArrayList<Question> r;
+		
+		r = questions.stream()
+		.filter(q -> !q.label.isEmpty())										//filter questions with label
+		.collect(Collectors.toCollection(ArrayList::new));
+
+		return r;
+	}
+	
+	private static void initializeEFileModel(ArrayList<Question> regQuestions, ArrayList<Question> demoQuestions, Map<String, Integer> positionsOfAllQuestions){
+		Predicate<String> containsHearAgain = label -> {
+			String l = label.toLowerCase();
+			return (l.contains("hear") && l.contains("again")) || (l.contains("repeat") && l.contains("answers"));
+		};
+		
+		int number = 1;
+		ArrayList<Question> filteredRegQuestions = filterOutBadRegQuestions(regQuestions);
+		for(Question frq : filteredRegQuestions){
+			frq.choices.removeIf(choice -> containsHearAgain.test(choice[1]));
+			
+			int numOfChoices = frq.choices.size();
+			String[] labels = new String[numOfChoices];
+			int[] positions = new int[numOfChoices];
+			String[] codes = new String[numOfChoices];
+			int position = positionsOfAllQuestions.get(frq.variable);
+			
+			EFileModel.initRowArrays(frq.choices, numOfChoices, position, labels, positions, codes);
+			String excelWorksheetTitle = EFileModel.getExcelWorksheetTitle(frq.label, frq.variable);
+			Table t = EFileModel.addTable(number++, frq.label, excelWorksheetTitle, labels, positions, codes);
+			questionAndTableBiMap.put(frq, t);
+		}
+		
+		
+		ArrayList<Question> filteredDemoQuestions = filterOutBadDemoQuestions(demoQuestions);
+		for(Question fdq : filteredDemoQuestions){
+			fdq.choices.removeIf(choice -> containsHearAgain.test(choice[1]));
+			
+			int numOfChoices = fdq.choices.size();
+			String[] labels = new String[numOfChoices];
+			int[] positions = new int[numOfChoices];
+			String[] codes = new String[numOfChoices];
+			int position = positionsOfAllQuestions.get(fdq.variable);
+			
+			EFileModel.initRowArrays(fdq.choices, numOfChoices, position, labels, positions, codes);
+			
+			
+			Table t = EFileModel.addTable(number++, fdq.label, fdq.variable, labels, positions, codes);
+			questionAndTableBiMap.put(fdq, t);
+		}
 	}
 }

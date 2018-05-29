@@ -12,7 +12,7 @@ class Question{
 	String elseDestination;
 	int ifSkip;
 	int elseSkip;
-	ArrayList<String[]> choices;//[0]=code; [1]=label; [2]=skipDestination
+	ArrayList<String[]> choices;//[0]=code; [1]=label; [2]=skipDestination TODO: make inner class
 	
 	Question(String variable, int codeWidth, String label, String identifier, int quePosition, String shortLabel, String skipCondition, String ifDestination, String elseDestination, int ifSkip, int elseSkip, ArrayList<String[]> choices){
 		this.variable = variable;

@@ -15,7 +15,8 @@ public class UncleConvert{
 	}
 
 	private static void test(){
-		String filePath = "G:\\FORUM\\FOLD\\FOLD - COPY.ASC";
+		String filePath = "G:\\FORUM\\FOMH\\FOMH.ASC";
+		//String filePath = "G:\\FORUM\\FOLD\\FOLD - COPY.ASC";
 		//String filePath = "E:\\MAN_SON\\Projects\\IdeaProjects\\EnterUncle2\\FOMB.ASC";
 		
 		File file = new File(filePath);
